@@ -206,14 +206,14 @@ export default function ParkCard({
               </button>
             ) : isCheckedIn ? (
               <button
-                onClick={() => { onCheckIn(); onClose() }}
+                onClick={onCheckIn}
                 className="w-full bg-green-500 text-forest rounded-xl py-3.5 text-sm font-display font-bold tracking-wide hover:bg-green-400 transition-colors"
               >
                 Move Here
               </button>
             ) : (
               <button
-                onClick={() => { onCheckIn(); onClose() }}
+                onClick={onCheckIn}
                 className="w-full bg-green-500 text-forest rounded-xl py-3.5 text-sm font-display font-bold tracking-wide hover:bg-green-400 transition-colors"
               >
                 Check In
