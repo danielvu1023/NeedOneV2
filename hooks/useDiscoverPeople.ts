@@ -16,18 +16,21 @@ export function useDiscoverPeople() {
     if (!session) return
     let cancelled = false
     setLoading(true)
-    supabase
-      .from('profiles')
-      .select('id, first_name, last_name, avatar_url')
-      .order('first_name')
-      .limit(500)
-      .then(({ data }) => {
-        if (!cancelled) setAllProfiles(data ?? [])
-      })
-      .catch(() => {}) // silently show empty list on error
-      .finally(() => {
+    const run = async () => {
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name, avatar_url')
+          .order('first_name')
+          .limit(500)
+        if (!cancelled) setAllProfiles((data ?? []) as Profile[])
+      } catch {
+        // silently show empty list on error
+      } finally {
         if (!cancelled) setLoading(false)
-      })
+      }
+    }
+    run()
     return () => { cancelled = true }
   }, [session?.user.id])
 

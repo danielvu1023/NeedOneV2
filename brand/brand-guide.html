@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeedOne — Brand Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+  <style>
+    /* ─── TOKENS ──────────────────────────────────────────── */
+    :root {
+      --sage:     #EFF5E4;   /* background — court-grass tinted white */
+      --sage-mid: #D8EBC4;   /* subtle section dividers */
+      --forest:   #0D1F0A;   /* primary text — deep green-black */
+      --green:    #22C55E;   /* electric green — primary accent */
+      --lime:     #CBFF47;   /* pickleball yellow-green — secondary accent */
+      --orange:   #FF5C38;   /* punch / alert */
+      --white:    #FFFFFF;
+      --muted:    #6B7A5E;   /* secondary text */
+
+      --font-display: 'Unbounded', sans-serif;
+      --font-body:    'Outfit', sans-serif;
+
+      --r-sm: 8px;
+      --r-md: 16px;
+      --r-lg: 24px;
+      --r-full: 999px;
+    }
+
+    /* ─── RESET ───────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--sage);
+      color: var(--forest);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ─── COURT-LINE TEXTURE ──────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 59px,
+          rgba(34,197,94,0.06) 59px,
+          rgba(34,197,94,0.06) 60px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 59px,
+          rgba(34,197,94,0.04) 59px,
+          rgba(34,197,94,0.04) 60px
+        );
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── LAYOUT ──────────────────────────────────────────── */
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    section { padding: 96px 0; }
+    section + section { border-top: 1px solid var(--sage-mid); }
+
+    .label {
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--sage-mid);
+    }
+
+    /* ─── HERO ────────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 0 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Big decorative pickleball behind hero */
+    .hero::after {
+      content: '';
+      position: absolute;
+      right: -120px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 520px;
+      height: 520px;
+      border-radius: 50%;
+      border: 40px solid var(--lime);
+      opacity: 0.18;
+    }
+
+    .wordmark {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(72px, 10vw, 140px);
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+      color: var(--forest);
+      animation: fadeUp 0.8s ease both;
+    }
+    .wordmark span {
+      color: var(--green);
+    }
+
+    .hero-sub {
+      margin-top: 32px;
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--muted);
+      max-width: 440px;
+      animation: fadeUp 0.8s 0.15s ease both;
+    }
+
+    .tagline-options {
+      margin-top: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+    .tagline-label {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .tagline-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      padding: 14px 20px;
+      border-radius: var(--r-md);
+      border: 1.5px solid transparent;
+      transition: all 0.2s;
+      max-width: 480px;
+      background: transparent;
+      font-family: inherit;
+      text-align: left;
+    }
+    .tagline-option:hover {
+      border-color: var(--green);
+      background: rgba(34,197,94,0.06);
+    }
+    .tagline-option.active {
+      border-color: var(--green);
+      background: rgba(34,197,94,0.1);
+    }
+    .tagline-option .num {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green);
+      width: 24px;
+      flex-shrink: 0;
+    }
+    .tagline-option .text {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--forest);
+      font-family: var(--font-display);
+    }
+    .tagline-option .desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin-left: auto;
+      font-style: italic;
+    }
+
+    .hero-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--forest);
+      color: var(--lime);
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border-radius: var(--r-full);
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s ease both;
+    }
+    .hero-chip .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--lime);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+
+    /* ─── COLOR ───────────────────────────────────────────── */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+    }
+    .swatch {
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(13,31,10,0.08);
+    }
+    .swatch-block {
+      height: 140px;
+      position: relative;
+    }
+    .swatch-block.tall { height: 200px; }
+    .swatch-info {
+      background: var(--white);
+      padding: 14px 16px;
+    }
+    .swatch-name {
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--forest);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .swatch-hex {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+      font-family: 'Courier New', monospace;
+    }
+    .swatch-role {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ─── TYPOGRAPHY ──────────────────────────────────────── */
+    .type-showcase {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+    .type-row {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      align-items: baseline;
+      gap: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--sage-mid);
+    }
+    .type-meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .type-meta strong {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--forest);
+      margin-bottom: 4px;
+    }
+    .t-hero   { font-family: var(--font-display); font-weight: 900; font-size: 80px; line-height: 0.95; letter-spacing: -0.03em; }
+    .t-h1     { font-family: var(--font-display); font-weight: 700; font-size: 48px; line-height: 1.05; letter-spacing: -0.02em; }
+    .t-h2     { font-family: var(--font-display); font-weight: 700; font-size: 32px; line-height: 1.1; }
+    .t-h3     { font-family: var(--font-display); font-weight: 400; font-size: 22px; }
+    .t-body   { font-family: var(--font-body);    font-weight: 400; font-size: 16px; line-height: 1.7; color: var(--muted); }
+    .t-small  { font-family: var(--font-body);    font-weight: 500; font-size: 13px; letter-spacing: 0.01em; }
+    .t-label  { font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+
+    /* ─── COMPONENTS ──────────────────────────────────────── */
+    .component-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+    .component-block {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .component-title {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: all 0.18s;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .btn-lg  { padding: 18px 36px; border-radius: var(--r-md); font-size: 14px; }
+    .btn-md  { padding: 13px 24px; border-radius: var(--r-md); }
+    .btn-sm  { padding: 9px 16px;  border-radius: var(--r-sm); font-size: 11px; }
+
+    .btn-primary { background: var(--green); color: var(--forest); }
+    .btn-primary:hover { background: #1aad4f; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(34,197,94,0.35); }
+
+    .btn-lime { background: var(--lime); color: var(--forest); }
+    .btn-lime:hover { background: #b8f035; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(203,255,71,0.4); }
+
+    .btn-dark { background: var(--forest); color: var(--lime); }
+    .btn-dark:hover { background: #1a3315; transform: translateY(-1px); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--forest);
+      border: 2px solid var(--forest);
+    }
+    .btn-outline:hover { background: var(--forest); color: var(--sage); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--green);
+      border: 2px solid var(--green);
+    }
+    .btn-ghost:hover { background: var(--green); color: var(--forest); }
+
+    /* Badges */
+    .badge-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: var(--r-full);
+    }
+    .badge-green  { background: rgba(34,197,94,0.15);  color: #15803d; }
+    .badge-lime   { background: rgba(203,255,71,0.3);  color: #4d7c0f; }
+    .badge-forest { background: var(--forest); color: var(--lime); }
+    .badge-orange { background: rgba(255,92,56,0.12);  color: #c2410c; }
+    .badge .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+    /* Avatar heads (the signature UI element) */
+    .avatar-row { display: flex; gap: -8px; }
+    .avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 3px solid var(--sage);
+      margin-left: -8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13px;
+      color: white;
+      position: relative;
+    }
+    .avatar:first-child { margin-left: 0; }
+    .avatar.self { border-color: #3b82f6; box-shadow: 0 0 0 2px #3b82f6, 0 0 10px 3px rgba(59,130,246,0.4); }
+    .avatar.friend { border-color: var(--green); box-shadow: 0 0 0 2px var(--green), 0 0 10px 3px rgba(34,197,94,0.35); }
+    .avatar.other { border-color: white; }
+    .avatar-label {
+      position: absolute;
+      bottom: -20px;
+      left: 50%; transform: translateX(-50%);
+      font-size: 10px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      white-space: nowrap;
+      color: var(--muted);
+    }
+
+    /* Check-in chip */
+    .checkin-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--forest);
+      color: white;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 10px 20px;
+      border-radius: var(--r-full);
+      box-shadow: 0 4px 20px rgba(13,31,10,0.25);
+    }
+    .checkin-chip .indicator {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    .checkin-chip .close {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 10px;
+    }
+
+    /* Park pin */
+    .park-pin {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .park-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--green);
+      color: white;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 12px;
+      padding: 8px 14px;
+      border-radius: var(--r-full);
+      box-shadow: 0 4px 16px rgba(34,197,94,0.4);
+    }
+    .pin-tip {
+      width: 0; height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid var(--green);
+    }
+
+    /* Card */
+    .app-card {
+      background: white;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 4px 32px rgba(13,31,10,0.1);
+      max-width: 340px;
+    }
+    .app-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .app-card h3 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 20px;
+    }
+    .app-card p {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .player-count {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .player-count .dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--green);
+    }
+
+    /* ─── MOTION ──────────────────────────────────────────── */
+    .motion-section {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .motion-card {
+      background: white;
+      border-radius: var(--r-lg);
+      padding: 32px 24px;
+      text-align: center;
+      box-shadow: 0 2px 16px rgba(13,31,10,0.07);
+    }
+    .motion-card h4 {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 16px 0 8px;
+    }
+    .motion-card p { font-size: 13px; color: var(--muted); }
+    .motion-demo {
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .spin-ball {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: var(--lime);
+      border: 4px solid var(--forest);
+      position: relative;
+      animation: spinBall 3s linear infinite;
+    }
+    .spin-ball::before, .spin-ball::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid rgba(13,31,10,0.3);
+    }
+    .spin-ball::before { inset: 6px; }
+    .spin-ball::after { inset: 14px; }
+
+    .slide-chip {
+      background: var(--forest);
+      color: var(--lime);
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 8px 18px;
+      border-radius: var(--r-full);
+      animation: slideUp 2.5s ease-in-out infinite;
+    }
+
+    .ping-dot {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--green);
+      position: relative;
+    }
+    .ping-dot::after {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 2px solid var(--green);
+      animation: pingExpand 2s ease-out infinite;
+    }
+
+    /* ─── LOGO USAGE ──────────────────────────────────────── */
+    .logo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .logo-bg {
+      border-radius: var(--r-lg);
+      padding: 48px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .logo-bg.on-sage  { background: var(--sage); border: 1px solid var(--sage-mid); }
+    .logo-bg.on-dark  { background: var(--forest); }
+    .logo-bg.on-green { background: var(--green); }
+
+    .logo-sm {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 36px;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .logo-sm span { color: var(--green); }
+    .on-dark .logo-sm { color: white; }
+    .on-dark .logo-sm span { color: var(--lime); }
+    .on-green .logo-sm { color: var(--forest); }
+    .on-green .logo-sm span { color: var(--white); }
+
+    .logo-bg p {
+      font-size: 12px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .on-dark p { color: rgba(255,255,255,0.4); }
+    .on-green p { color: rgba(13,31,10,0.5); }
+
+    /* ─── FOOTER ──────────────────────────────────────────── */
+    footer {
+      padding: 48px 0;
+      border-top: 1px solid var(--sage-mid);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    footer .wordmark-sm {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 24px;
+      letter-spacing: -0.03em;
+    }
+    footer .wordmark-sm span { color: var(--green); }
+    footer p { font-size: 13px; color: var(--muted); }
+
+    /* ─── ANIMATIONS ──────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.6; transform: scale(0.85); }
+    }
+    @keyframes spinBall {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes slideUp {
+      0%, 100% { transform: translateY(8px); opacity: 0; }
+      20%, 80% { transform: translateY(0);   opacity: 1; }
+    }
+    @keyframes pingExpand {
+      from { transform: scale(0.8); opacity: 1; }
+      to   { transform: scale(2.2); opacity: 0; }
+    }
+
+    /* ─── ICON SVG INLINE HELPERS ─────────────────────────── */
+    .icon { width: 20px; height: 20px; flex-shrink: 0; }
+
+    /* ─── SPACING & SCALE ─────────────────────────────────── */
+    .spacing-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .sp-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .sp-square {
+      background: var(--green);
+      opacity: 0.7;
+      border-radius: 4px;
+    }
+    .sp-label {
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── HERO ────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-chip">
+      <span class="dot"></span>
+      Brand Guidelines v1.0
+    </div>
+
+    <h1 class="wordmark">Need<span>One</span></h1>
+
+    <p class="hero-sub">
+      Real-time pickleball social app. See who's at your local courts, check in, and find your game.
+    </p>
+
+    <div class="tagline-options">
+      <p class="tagline-label">Choose a tagline ↓</p>
+
+      <button class="tagline-option active" onclick="selectTagline(this)">
+        <span class="num">01</span>
+        <span class="text">Find your fourth.</span>
+        <span class="desc">Pickleball insider — doubles needs 4</span>
+      </button>
+
+      <button class="tagline-option" onclick="selectTagline(this)">
+        <span class="num">02</span>
+        <span class="text">See who's on court.</span>
+        <span class="desc">Maps directly to the core feature</span>
+      </button>
+
+      <button class="tagline-option" onclick="selectTagline(this)">
+        <span class="num">03</span>
+        <span class="text">Your game starts here.</span>
+        <span class="desc">Action-oriented, broad appeal</span>
+      </button>
+
+      <button class="tagline-option" onclick="selectTagline(this)">
+        <span class="num">04</span>
+        <span class="text">Tap in. Play out.</span>
+        <span class="desc">Social + sport duality, short and punchy</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ─── LOGO USAGE ───────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <p class="label">01 — Logo & Wordmark</p>
+    <div class="logo-grid">
+      <div class="logo-bg on-sage">
+        <div class="logo-sm">Need<span>One</span></div>
+        <p>On light</p>
+      </div>
+      <div class="logo-bg on-dark">
+        <div class="logo-sm">Need<span>One</span></div>
+        <p>On dark</p>
+      </div>
+      <div class="logo-bg on-green">
+        <div class="logo-sm">Need<span>One</span></div>
+        <p>On green</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── COLOR ───────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <p class="label">02 — Color System</p>
+    <div class="color-grid">
+
+      <div class="swatch">
+        <div class="swatch-block tall" style="background:#22C55E;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Electric Green</div>
+          <div class="swatch-hex">#22C55E</div>
+          <div class="swatch-role">Primary accent — CTAs, active states</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-block tall" style="background:#CBFF47;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Court Lime</div>
+          <div class="swatch-hex">#CBFF47</div>
+          <div class="swatch-role">Secondary accent — the ball color</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-block tall" style="background:#0D1F0A;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Forest</div>
+          <div class="swatch-hex">#0D1F0A</div>
+          <div class="swatch-role">Primary text, dark surfaces</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-block tall" style="background:#EFF5E4;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Sage White</div>
+          <div class="swatch-hex">#EFF5E4</div>
+          <div class="swatch-role">Background — not pure white</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-block tall" style="background:#FF5C38;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Rally Orange</div>
+          <div class="swatch-hex">#FF5C38</div>
+          <div class="swatch-role">Alerts, notifications, urgency</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-block tall" style="background:#6B7A5E;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Moss</div>
+          <div class="swatch-hex">#6B7A5E</div>
+          <div class="swatch-role">Secondary text, muted labels</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── TYPOGRAPHY ───────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <p class="label">03 — Typography</p>
+    <div class="type-showcase">
+
+      <div class="type-row">
+        <div class="type-meta">
+          <strong>Display / Hero</strong>
+          Unbounded 900<br>80px / −3% tracking
+        </div>
+        <div class="t-hero">NeedOne</div>
+      </div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <strong>Heading 1</strong>
+          Unbounded 700<br>48px / −2% tracking
+        </div>
+        <div class="t-h1">Find your fourth.</div>
+      </div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <strong>Heading 2</strong>
+          Unbounded 700<br>32px
+        </div>
+        <div class="t-h2">Who's at the park?</div>
+      </div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <strong>Heading 3</strong>
+          Unbounded 400<br>22px
+        </div>
+        <div class="t-h3">Hollenbeck Park · 5 players</div>
+      </div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <strong>Body</strong>
+          Outfit 400<br>16px / 1.7 line-height
+        </div>
+        <div class="t-body">Check in when you arrive. Your friends see you on the map instantly. No texts needed — just show up and find your game.</div>
+      </div>
+
+      <div class="type-row" style="border-bottom:none;">
+        <div class="type-meta">
+          <strong>Label / UI</strong>
+          Unbounded 700<br>11px / +14% tracking
+        </div>
+        <div class="t-label">Checked in · 20 min ago</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── COMPONENTS ───────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <p class="label">04 — UI Components</p>
+    <div class="component-grid">
+
+      <!-- Buttons -->
+      <div class="component-block">
+        <div class="component-title">Buttons</div>
+        <div><button class="btn btn-primary btn-lg">Check In</button></div>
+        <div><button class="btn btn-lime btn-lg">Find a game</button></div>
+        <div><button class="btn btn-dark btn-md">Add Friend</button></div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <button class="btn btn-outline btn-md">Move Here</button>
+          <button class="btn btn-ghost btn-md">View Park</button>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm">Check In</button>
+          <button class="btn btn-dark btn-sm">Add</button>
+          <button class="btn btn-ghost btn-sm">Sent ✓</button>
+        </div>
+      </div>
+
+      <!-- Badges & Status -->
+      <div class="component-block">
+        <div class="component-title">Badges & Status</div>
+        <div class="badge-row">
+          <span class="badge badge-green"><span class="dot"></span> Active</span>
+          <span class="badge badge-lime">4 Players</span>
+          <span class="badge badge-forest">Friends</span>
+          <span class="badge badge-orange">1 Request</span>
+        </div>
+
+        <div class="component-title" style="margin-top:8px;">Check-in Chip</div>
+        <div class="checkin-chip">
+          <span class="indicator"></span>
+          <span>Checked in at Hollenbeck Park</span>
+          <span class="close">✕</span>
+        </div>
+
+        <div class="component-title" style="margin-top:8px;">Park Pin</div>
+        <div class="park-pin">
+          <div class="park-pill">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="12" r="10" stroke="white" stroke-width="1.5" fill="none"/>
+              <path d="M12 2 Q8 7 8 12 Q8 17 12 22" stroke="white" stroke-width="1.5" fill="none"/>
+              <path d="M12 2 Q16 7 16 12 Q16 17 12 22" stroke="white" stroke-width="1.5" fill="none"/>
+            </svg>
+            5
+          </div>
+          <div class="pin-tip"></div>
+        </div>
+
+        <div class="component-title" style="margin-top:8px;">Avatar Heads</div>
+        <div class="avatar-row" style="padding: 20px 12px 30px;">
+          <div class="avatar self"   style="background:#3b82f6;">DV
+            <span class="avatar-label">You</span>
+          </div>
+          <div class="avatar friend" style="background:#16a34a;">JM
+            <span class="avatar-label">Friend</span>
+          </div>
+          <div class="avatar other"  style="background:#6366f1;">KL
+            <span class="avatar-label">Other</span>
+          </div>
+          <div class="avatar other"  style="background:#f59e0b;">PR
+            <span class="avatar-label">Other</span>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);">
+          <strong style="color:var(--forest);">Blue ring</strong> = you &nbsp;·&nbsp;
+          <strong style="color:var(--green);">Green glow</strong> = friend &nbsp;·&nbsp;
+          <strong>White</strong> = other
+        </div>
+      </div>
+
+      <!-- Park Card -->
+      <div class="component-block">
+        <div class="component-title">Park Card (bottom sheet)</div>
+        <div class="app-card">
+          <div class="app-card-header">
+            <h3>Hollenbeck Park</h3>
+            <span class="badge badge-lime">Open</span>
+          </div>
+          <p>Covina pickleball courts — 4 dedicated courts, lights until 10pm.</p>
+          <div class="player-count">
+            <span class="dot"></span>
+            <span>5 players here right now</span>
+          </div>
+          <button class="btn btn-primary btn-md" style="width:100%">Check In</button>
+        </div>
+      </div>
+
+      <!-- Spacing -->
+      <div class="component-block">
+        <div class="component-title">Spacing Scale</div>
+        <div class="spacing-row">
+          <div class="sp-block">
+            <div class="sp-square" style="width:4px;height:4px;"></div>
+            <span class="sp-label">4</span>
+          </div>
+          <div class="sp-block">
+            <div class="sp-square" style="width:8px;height:8px;"></div>
+            <span class="sp-label">8</span>
+          </div>
+          <div class="sp-block">
+            <div class="sp-square" style="width:12px;height:12px;"></div>
+            <span class="sp-label">12</span>
+          </div>
+          <div class="sp-block">
+            <div class="sp-square" style="width:16px;height:16px;"></div>
+            <span class="sp-label">16</span>
+          </div>
+          <div class="sp-block">
+            <div class="sp-square" style="width:24px;height:24px;"></div>
+            <span class="sp-label">24</span>
+          </div>
+          <div class="sp-block">
+            <div class="sp-square" style="width:32px;height:32px;"></div>
+            <span class="sp-label">32</span>
+          </div>
+          <div class="sp-block">
+            <div class="sp-square" style="width:40px;height:40px;"></div>
+            <span class="sp-label">40</span>
+          </div>
+          <div class="sp-block">
+            <div class="sp-square" style="width:48px;height:48px;"></div>
+            <span class="sp-label">48</span>
+          </div>
+          <div class="sp-block">
+            <div class="sp-square" style="width:64px;height:64px;"></div>
+            <span class="sp-label">64</span>
+          </div>
+          <div class="sp-block">
+            <div class="sp-square" style="width:96px;height:96px;"></div>
+            <span class="sp-label">96</span>
+          </div>
+        </div>
+
+        <div class="component-title" style="margin-top:32px;">Border Radius</div>
+        <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
+          <div style="width:56px;height:56px;background:var(--green);opacity:0.7;border-radius:8px;"></div>
+          <div style="width:56px;height:56px;background:var(--green);opacity:0.7;border-radius:16px;"></div>
+          <div style="width:56px;height:56px;background:var(--green);opacity:0.7;border-radius:24px;"></div>
+          <div style="width:56px;height:56px;background:var(--green);opacity:0.7;border-radius:999px;"></div>
+        </div>
+        <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-top:8px;">
+          <span class="sp-label" style="width:56px;text-align:center;">8px</span>
+          <span class="sp-label" style="width:56px;text-align:center;">16px</span>
+          <span class="sp-label" style="width:56px;text-align:center;">24px</span>
+          <span class="sp-label" style="width:56px;text-align:center;">Full</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── MOTION ───────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <p class="label">05 — Motion & Animation</p>
+    <div class="motion-section">
+
+      <div class="motion-card">
+        <div class="motion-demo">
+          <div class="spin-ball"></div>
+        </div>
+        <h4>Ball Spin</h4>
+        <p>Loading states — spin animation mirrors a real pickleball in play</p>
+      </div>
+
+      <div class="motion-card">
+        <div class="motion-demo">
+          <div class="slide-chip">Checked in</div>
+        </div>
+        <h4>Slide Up</h4>
+        <p>Check-in chip entrance — slides up from bottom like a sheet</p>
+      </div>
+
+      <div class="motion-card">
+        <div class="motion-demo">
+          <div class="ping-dot"></div>
+        </div>
+        <h4>Ping / Pulse</h4>
+        <p>Active player indicator — expanding ring shows live presence</p>
+      </div>
+
+    </div>
+
+    <div style="margin-top:32px;padding:24px;background:white;border-radius:var(--r-lg);box-shadow:0 2px 16px rgba(13,31,10,0.07);">
+      <div class="component-title">Animation Principles</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:16px;">
+        <div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:13px;margin-bottom:6px;">Duration</div>
+          <div style="font-size:13px;color:var(--muted);">UI interactions: 150–200ms<br>Sheet transitions: 300ms<br>Page enters: 600–800ms</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:13px;margin-bottom:6px;">Easing</div>
+          <div style="font-size:13px;color:var(--muted);">Enter: ease-out<br>Exit: ease-in<br>Continuous: ease-in-out</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:13px;margin-bottom:6px;">Principles</div>
+          <div style="font-size:13px;color:var(--muted);">Stagger reveals on page load<br>Never animate layout<br>Reduce motion respected</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── VOICE & TONE ─────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <p class="label">06 — Voice & Tone</p>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:24px;">
+
+      <div style="background:white;border-radius:var(--r-lg);padding:32px;box-shadow:0 2px 16px rgba(13,31,10,0.07);">
+        <div style="font-family:var(--font-display);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:var(--green);margin-bottom:20px;">✓ Do say</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:12px;">
+          <li style="font-size:15px;color:var(--forest);">"Find your fourth" <span style="font-size:13px;color:var(--muted);">— insider language</span></li>
+          <li style="font-size:15px;color:var(--forest);">"Tap in" <span style="font-size:13px;color:var(--muted);">— short, action-first</span></li>
+          <li style="font-size:15px;color:var(--forest);">"5 players here now" <span style="font-size:13px;color:var(--muted);">— real-time, specific</span></li>
+          <li style="font-size:15px;color:var(--forest);">"Courts are live" <span style="font-size:13px;color:var(--muted);">— energy, urgency</span></li>
+          <li style="font-size:15px;color:var(--forest);">"Your crew is at Hollenbeck" <span style="font-size:13px;color:var(--muted);">— personal, social</span></li>
+        </ul>
+      </div>
+
+      <div style="background:white;border-radius:var(--r-lg);padding:32px;box-shadow:0 2px 16px rgba(13,31,10,0.07);">
+        <div style="font-family:var(--font-display);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);margin-bottom:20px;">✗ Don't say</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:12px;">
+          <li style="font-size:15px;color:var(--muted);">"Connect with players" <span style="font-size:13px;">— generic, LinkedIn energy</span></li>
+          <li style="font-size:15px;color:var(--muted);">"Optimize your game" <span style="font-size:13px;">— fitness app cliché</span></li>
+          <li style="font-size:15px;color:var(--muted);">"Building community" <span style="font-size:13px;">— vague marketing speak</span></li>
+          <li style="font-size:15px;color:var(--muted);">"Premium experience" <span style="font-size:13px;">— not what this is about</span></li>
+          <li style="font-size:15px;color:var(--muted);">"Track your performance" <span style="font-size:13px;">— wrong app, wrong vibe</span></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ───────────────────────────────────────────── -->
+<div class="wrap">
+  <footer>
+    <div class="wordmark-sm">Need<span>One</span></div>
+    <p>Brand Guidelines v1.0 &nbsp;·&nbsp; For internal use</p>
+  </footer>
+</div>
+
+<script>
+  function selectTagline(el) {
+    document.querySelectorAll('.tagline-option').forEach(o => o.classList.remove('active'));
+    el.classList.add('active');
+  }
+</script>
+
+</body>
+</html>

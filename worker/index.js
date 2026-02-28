@@ -1,12 +1,6 @@
-// Service Worker for NeedOne push notifications
-
-self.addEventListener('install', () => {
-  self.skipWaiting()
-})
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim())
-})
+// Custom push notification handlers for NeedOne
+// This file is bundled into the next-pwa generated service worker via customWorkerDir.
+// Do NOT add install/activate handlers here — next-pwa manages those.
 
 self.addEventListener('push', (event) => {
   if (!event.data) return
@@ -14,8 +8,8 @@ self.addEventListener('push', (event) => {
   const data = event.data.json()
   const options = {
     body: data.body || '',
-    icon: '/icon-192.png',
-    badge: '/icon-192.png',
+    icon: '/icons/icon-192.png',
+    badge: '/icons/icon-192.png',
     data: data.url ? { url: data.url } : {},
     vibrate: [100, 50, 100],
   }
