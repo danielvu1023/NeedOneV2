@@ -28,13 +28,12 @@ export default function ParkCard({
   const playerCount = checkIns.length
 
   return (
-    // hidden=true slides it off-screen so UserBottomSheet can take the slot
     <div className={`transition-transform duration-300 ease-out ${hidden ? 'translate-y-full' : ''}`}>
       <BottomSheet open={!!park} onClose={onClose}>
-        <div className="px-6 pb-8 pt-4">
+        <div className="px-6 pt-4" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
           <div className="flex items-start justify-between mb-1">
-            <h2 className="text-white text-xl font-bold">{park.name}</h2>
-            <button onClick={onClose} className="text-zinc-500 hover:text-zinc-300 transition-colors">
+            <h2 className="text-forest text-xl font-display font-bold">{park.name}</h2>
+            <button onClick={onClose} className="text-moss hover:text-forest transition-colors p-1">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -42,12 +41,12 @@ export default function ParkCard({
           </div>
 
           {park.description && (
-            <p className="text-zinc-400 text-sm mb-4">{park.description}</p>
+            <p className="text-moss text-sm mb-4">{park.description}</p>
           )}
 
           <div className="flex items-center gap-1.5 mb-6">
-            <div className={`w-2 h-2 rounded-full ${playerCount > 0 ? 'bg-green-500' : 'bg-zinc-600'}`} />
-            <span className="text-zinc-300 text-sm">
+            <div className={`w-2 h-2 rounded-full ${playerCount > 0 ? 'bg-green-500' : 'bg-sage-mid'}`} />
+            <span className="text-forest/70 text-sm">
               {playerCount === 0
                 ? 'No one here right now'
                 : `${playerCount} player${playerCount === 1 ? '' : 's'} here`}
@@ -57,23 +56,23 @@ export default function ParkCard({
           {isCheckedInHere ? (
             <button
               onClick={() => { onCheckOut(); onClose() }}
-              className="w-full bg-zinc-800 border border-zinc-700 text-white rounded-xl py-3.5 text-sm font-semibold hover:bg-zinc-700 transition-colors"
+              className="w-full bg-white border-2 border-forest text-forest rounded-xl py-4 text-sm font-display font-bold tracking-wide hover:bg-sage transition-colors"
             >
-              Check out
+              Check Out
             </button>
           ) : isCheckedIn ? (
             <button
               onClick={() => { onCheckIn(); onClose() }}
-              className="w-full bg-white text-black rounded-xl py-3.5 text-sm font-semibold hover:bg-zinc-100 transition-colors"
+              className="w-full bg-green-500 text-forest rounded-xl py-4 text-sm font-display font-bold tracking-wide hover:bg-green-400 transition-colors"
             >
-              Move here
+              Move Here
             </button>
           ) : (
             <button
               onClick={() => { onCheckIn(); onClose() }}
-              className="w-full bg-white text-black rounded-xl py-3.5 text-sm font-semibold hover:bg-zinc-100 transition-colors"
+              className="w-full bg-green-500 text-forest rounded-xl py-4 text-sm font-display font-bold tracking-wide hover:bg-green-400 transition-colors"
             >
-              Check in
+              Check In
             </button>
           )}
         </div>
