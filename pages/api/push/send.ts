@@ -22,6 +22,13 @@ try {
   console.warn('web-push not installed — push notifications disabled. Run: npm install web-push')
 }
 
+const COOLDOWN_MS = 2 * 60 * 60 * 1000 // 2 hours
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+function isRelativePath(u: unknown): boolean {
+  return typeof u === 'string' && u.startsWith('/') && !u.startsWith('//')
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end()
 
@@ -31,9 +38,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: 'Unauthorized' })
   }
 
-  const { userId, title, body, url } = req.body
+  const { userId, notifierId, title, body, url } = req.body
 
-  if (!userId) return res.status(400).json({ error: 'userId required' })
+  if (!userId || !UUID_RE.test(userId)) return res.status(400).json({ error: 'Invalid userId' })
+  if (notifierId && !UUID_RE.test(notifierId)) return res.status(400).json({ error: 'Invalid notifierId' })
+
+  // Sanitise push payload fields
+  const safeTitle = typeof title === 'string' ? title.slice(0, 100) : 'NeedOne'
+  const safeBody = typeof body === 'string' ? body.slice(0, 200) : ''
+  const safeUrl = isRelativePath(url) ? url : '/'
+
+  // Rate limiting: if notifierId provided, check cooldown
+  if (notifierId) {
+    const cutoff = new Date(Date.now() - COOLDOWN_MS).toISOString()
+    const { data: cooldown } = await supabaseServer
+      .from('push_cooldowns')
+      .select('sent_at')
+      .eq('notifier_id', notifierId)
+      .eq('recipient_id', userId)
+      .single()
+
+    if (cooldown && cooldown.sent_at > cutoff) {
+      return res.status(200).json({ sent: 0, skipped: 'cooldown' })
+    }
+  }
 
   // Get all push subscriptions for this user
   const { data: subs } = await supabaseServer
@@ -47,7 +75,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ sent: 0, warning: 'web-push not installed' })
   }
 
-  const payload = JSON.stringify({ title, body, url: url || '/' })
+  const payload = JSON.stringify({ title: safeTitle, body: safeBody, url: safeUrl })
   let sent = 0
 
   await Promise.allSettled(
@@ -66,6 +94,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     })
   )
+
+  // Update cooldown record after successful send
+  if (notifierId && sent > 0) {
+    await supabaseServer
+      .from('push_cooldowns')
+      .upsert({ notifier_id: notifierId, recipient_id: userId, sent_at: new Date().toISOString() })
+  }
 
   return res.status(200).json({ sent })
 }

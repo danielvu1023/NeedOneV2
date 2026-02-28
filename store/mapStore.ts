@@ -5,17 +5,20 @@ interface MapStore {
   parks: Park[]
   activeCheckIns: CheckIn[]
   selectedPark: Park | null
+  pendingToast: CheckIn | null
   setParks: (parks: Park[]) => void
   setActiveCheckIns: (checkIns: CheckIn[]) => void
   upsertCheckIn: (checkIn: CheckIn) => void
   removeCheckIn: (checkInId: string) => void
   setSelectedPark: (park: Park | null) => void
+  setPendingToast: (checkIn: CheckIn | null) => void
 }
 
 export const useMapStore = create<MapStore>((set) => ({
   parks: [],
   activeCheckIns: [],
   selectedPark: null,
+  pendingToast: null,
 
   setParks: (parks) => set({ parks }),
   setActiveCheckIns: (checkIns) => set({ activeCheckIns: checkIns }),
@@ -37,4 +40,5 @@ export const useMapStore = create<MapStore>((set) => ({
     })),
 
   setSelectedPark: (park) => set({ selectedPark: park }),
+  setPendingToast: (checkIn) => set({ pendingToast: checkIn }),
 }))

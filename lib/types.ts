@@ -1,7 +1,10 @@
 export interface Profile {
   id: string
   username: string | null
+  first_name: string | null
+  last_name: string | null
   avatar_url: string | null
+  onboarding_completed: boolean | null
   created_at: string
 }
 

@@ -1,15 +1,15 @@
 import { getInitials, getAvatarColor } from '@/lib/avatarUtils'
 
 interface InitialsAvatarProps {
-  username: string
+  name: string
   userId: string
   size?: number
   className?: string
 }
 
-export default function InitialsAvatar({ username, userId, size = 40, className = '' }: InitialsAvatarProps) {
+export default function InitialsAvatar({ name, userId, size = 40, className = '' }: InitialsAvatarProps) {
   const bg = getAvatarColor(userId)
-  const initials = getInitials(username)
+  const initials = getInitials(name)
 
   return (
     <div

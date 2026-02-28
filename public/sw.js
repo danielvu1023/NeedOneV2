@@ -27,10 +27,14 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-  const url = event.notification.data?.url || '/'
+  // Only allow relative paths to prevent open-URL injection
+  const rawUrl = event.notification.data?.url
+  const url = (typeof rawUrl === 'string' && rawUrl.startsWith('/') && !rawUrl.startsWith('//'))
+    ? rawUrl
+    : '/'
   event.waitUntil(
     self.clients.matchAll({ type: 'window' }).then((clients) => {
-      const existing = clients.find((c) => c.url === url && 'focus' in c)
+      const existing = clients.find((c) => c.url.endsWith(url) && 'focus' in c)
       if (existing) return existing.focus()
       return self.clients.openWindow(url)
     })

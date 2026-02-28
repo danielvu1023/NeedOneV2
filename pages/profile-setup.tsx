@@ -6,7 +6,8 @@ import { useAuth } from '@/hooks/useAuth'
 export default function ProfileSetupPage() {
   const { session } = useAuth()
   const router = useRouter()
-  const [username, setUsername] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -44,13 +45,15 @@ export default function ProfileSetupPage() {
         .from('profiles')
         .upsert({
           id: session.user.id,
-          username: username.trim().toLowerCase(),
+          first_name: firstName.trim(),
+          last_name: lastName.trim() || null,
+          username: firstName.trim().toLowerCase().replace(/\s+/g, '_'),
           avatar_url,
         })
 
       if (upsertError) throw upsertError
 
-      router.replace('/')
+      router.replace('/onboarding')
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
@@ -59,11 +62,11 @@ export default function ProfileSetupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen bg-sage flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-white">Set up your profile</h1>
-          <p className="text-zinc-400 text-sm mt-1">How do you want to appear on the map?</p>
+          <h1 className="text-2xl font-display font-bold text-forest">What&apos;s your name?</h1>
+          <p className="text-moss text-sm mt-1">How you&apos;ll appear on the map</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -72,17 +75,17 @@ export default function ProfileSetupPage() {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="w-24 h-24 rounded-full bg-zinc-800 border-2 border-dashed border-zinc-600 flex items-center justify-center overflow-hidden hover:border-zinc-400 transition-colors"
+              className="w-24 h-24 rounded-full bg-white border-2 border-dashed border-sage-mid flex items-center justify-center overflow-hidden hover:border-moss transition-colors"
             >
               {avatarPreview ? (
                 <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
-                <svg className="w-8 h-8 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-8 h-8 text-moss" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
                 </svg>
               )}
             </button>
-            <p className="text-zinc-500 text-xs">Tap to add photo</p>
+            <p className="text-moss text-xs">Tap to add photo</p>
             <input
               ref={fileInputRef}
               type="file"
@@ -92,30 +95,40 @@ export default function ProfileSetupPage() {
             />
           </div>
 
-          {/* Username */}
+          {/* First name */}
           <div>
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="username"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="First name"
               required
-              minLength={3}
-              maxLength={20}
-              pattern="[a-zA-Z0-9_]+"
-              className="w-full bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-500 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-zinc-500 transition-colors"
+              minLength={1}
+              maxLength={50}
+              className="w-full bg-white border border-sage-mid text-forest placeholder-moss rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-moss transition-colors"
             />
-            <p className="text-zinc-600 text-xs mt-1.5 px-1">Letters, numbers, underscores only</p>
           </div>
 
-          {error && <p className="text-red-400 text-xs">{error}</p>}
+          {/* Last name */}
+          <div>
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Last name (optional)"
+              maxLength={50}
+              className="w-full bg-white border border-sage-mid text-forest placeholder-moss rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-moss transition-colors"
+            />
+          </div>
+
+          {error && <p className="text-rally text-xs">{error}</p>}
 
           <button
             type="submit"
-            disabled={loading || !username.trim()}
-            className="w-full bg-white text-black font-semibold rounded-xl py-3.5 text-sm disabled:opacity-50 transition-opacity"
+            disabled={loading || !firstName.trim()}
+            className="w-full bg-green-500 text-forest font-display font-bold rounded-xl py-3.5 text-sm disabled:opacity-50 hover:bg-green-400 transition-all"
           >
-            {loading ? 'Saving…' : 'Let\'s go'}
+            {loading ? 'Saving…' : 'Continue'}
           </button>
         </form>
       </div>

@@ -5,7 +5,8 @@ import { useAuth } from '@/hooks/useAuth'
 import { useMapStore } from '@/store/mapStore'
 import BottomNav from '@/components/BottomNav'
 import NotificationBell from '@/components/NotificationBell'
-import PushPrompt from '@/components/PushPrompt'
+import CheckInToast from '@/components/CheckInToast'
+import PermissionModal from '@/components/PermissionModal'
 import ParkListSheet from '@/components/Map/ParkListSheet'
 
 const MapView = dynamic(() => import('@/components/Map/MapView'), { ssr: false })
@@ -22,36 +23,27 @@ export default function HomePage() {
 
   if (loading || !session) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-zinc-600 border-t-white rounded-full animate-spin" />
+      <div className="min-h-screen bg-sage flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-sage-mid border-t-forest rounded-full animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="fixed inset-0 bg-black">
+    <div className="fixed inset-0 bg-sage">
       {/* Full-screen map */}
-      <div className="absolute inset-0 bottom-16">
+      <div className="absolute inset-0" style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom))' }}>
         <MapView />
       </div>
 
       {/* Top-right: notification bell */}
       <NotificationBell />
 
-      {/* Top-left: parks list button */}
-      <button
-        onClick={() => setParkListOpen(true)}
-        className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/70 backdrop-blur-sm border border-zinc-700 rounded-full pl-3 pr-4 h-10 hover:bg-black/90 transition-colors"
-        aria-label="Parks list"
-      >
-        <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h8" />
-        </svg>
-        <span className="text-white text-sm font-medium">Parks</span>
-      </button>
+      {/* In-app check-in toast */}
+      <CheckInToast />
 
-      {/* Push notification prompt */}
-      <PushPrompt />
+      {/* Permission modal */}
+      <PermissionModal />
 
       {/* Park list sheet */}
       <ParkListSheet

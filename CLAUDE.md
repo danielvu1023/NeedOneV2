@@ -113,3 +113,38 @@ NEXT_PUBLIC_MAPBOX_TOKEN=              # from: mapbox.com/account/access-tokens
 - Check-in also triggers push notifications to friends (API route fans out to subscribers)
 - Friend discovery is proximity-based (both users checked in at the same park)
 - Design reference: Figma MCP is connected — share Figma URLs when providing design specs
+
+---
+
+## Security Checklist — Run Before Every Push
+
+Before committing or pushing any code change, verify each item below. These checks were established after a security audit of the MVP (2026-02-27).
+
+### API Routes (`pages/api/`)
+- [ ] **Auth on every route** — all routes either check `x-service-key` (internal) or verify a Bearer JWT via `supabaseServer.auth.getUser(token)` (user-facing). No unauthenticated endpoints.
+- [ ] **UUID validation** — any `userId`, `notifierId`, or similar ID param from a request body must be validated against `/^[0-9a-f]{8}-[0-9a-f]{4}-...-[0-9a-f]{12}$/i` before use.
+- [ ] **URL whitelist** — any `url` field passed from a request body to a push payload or redirect must start with `/` and not `//`. Use `isRelativePath()` from `push/send.ts` as the pattern.
+- [ ] **String length caps** — `title` ≤ 100 chars, `body` ≤ 200 chars before putting into push payloads or notification records.
+- [ ] **HTTP method guard** — every handler returns 405 for unexpected methods.
+
+### Supabase Queries (client-side hooks)
+- [ ] **Minimal column select** — never use `.select('*')` on `profiles` in a discovery or search context. Select only the fields the UI actually renders: `id, first_name, last_name, avatar_url`.
+- [ ] **Row limits** — any query that fetches a list without a user-supplied filter must have `.limit(N)` to prevent full-table scans.
+- [ ] **RLS coverage** — every new table must have `enable row level security` and at least one policy. Verify via `mcp__supabase__get_advisors({ type: 'security' })` after any migration.
+- [ ] **No service role client on the browser** — `supabaseServer` (service role) must only be imported inside `pages/api/`. Never imported in components, hooks, or lib files loaded client-side.
+
+### Service Worker (`public/sw.js`)
+- [ ] **URL validation before openWindow** — any URL used in `self.clients.openWindow()` must be validated as a relative path (`startsWith('/') && !startsWith('//')`) before use.
+
+### Auth & Redirects
+- [ ] **EXEMPT_PATHS is exhaustive** — whenever a new public/pre-auth page is added, add it to `EXEMPT_PATHS` in `hooks/useAuth.tsx` to prevent redirect loops.
+- [ ] **No open redirects** — router.replace/push targets must be hardcoded strings or validated against an allowlist, never derived from URL query params or user input.
+
+### Data Exposure
+- [ ] **Profiles are world-readable by design** (RLS `using (true)`) — be careful not to add sensitive fields (phone, email, location history) to the `profiles` table. Keep sensitive user data in `auth.users` (managed by Supabase) or a separate access-controlled table.
+- [ ] **localStorage is untrusted** — values from localStorage (permission states, dismissed timestamps) only affect the current user's own UI. Never use localStorage values to make security decisions server-side.
+
+### New Migrations
+- [ ] Add `not null` to columns that have defaults and should never be null (e.g. `sent_at`, `created_at`).
+- [ ] Run `mcp__supabase__get_advisors({ type: 'security' })` after applying migrations to catch missing RLS or policy gaps.
+- [ ] Run `mcp__supabase__get_advisors({ type: 'performance' })` to catch missing indexes on FK columns.

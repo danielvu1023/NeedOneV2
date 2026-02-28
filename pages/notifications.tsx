@@ -6,6 +6,7 @@ import { useNotifications } from '@/hooks/useNotifications'
 import { useFriendships } from '@/hooks/useFriendships'
 import InitialsAvatar from '@/components/InitialsAvatar'
 import BottomNav from '@/components/BottomNav'
+import { getDisplayName } from '@/lib/profileUtils'
 import type { Notification } from '@/lib/types'
 
 function NotificationItem({
@@ -18,6 +19,7 @@ function NotificationItem({
   onReject?: () => void
 }) {
   const actor = notification.actor
+  const displayName = getDisplayName(actor)
   const timeAgo = formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })
 
   let message = ''
@@ -26,28 +28,28 @@ function NotificationItem({
   if (notification.type === 'friend_checkin') message = `checked in at ${notification.park?.name ?? 'a park'}`
 
   return (
-    <div className={`flex items-start gap-3 p-4 rounded-xl ${notification.read ? 'bg-zinc-900/50' : 'bg-zinc-900'}`}>
+    <div className={`flex items-start gap-3 p-4 rounded-xl ${notification.read ? 'bg-white/50' : 'bg-white'}`}>
       <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
         {actor?.avatar_url ? (
-          <img src={actor.avatar_url} alt={actor.username ?? ''} className="w-full h-full object-cover" />
+          <img src={actor.avatar_url} alt={displayName} className="w-full h-full object-cover" />
         ) : actor ? (
-          <InitialsAvatar username={actor.username ?? '?'} userId={actor.id} size={40} />
+          <InitialsAvatar name={displayName} userId={actor.id} size={40} />
         ) : (
-          <div className="w-10 h-10 rounded-full bg-zinc-700" />
+          <div className="w-10 h-10 rounded-full bg-sage-mid" />
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-white text-sm">
-          <span className="font-semibold">{actor?.username ?? 'Someone'}</span>{' '}
-          <span className="text-zinc-300">{message}</span>
+        <p className="text-forest text-sm">
+          <span className="font-semibold">{displayName}</span>{' '}
+          <span className="text-moss">{message}</span>
         </p>
-        <p className="text-zinc-500 text-xs mt-0.5">{timeAgo}</p>
+        <p className="text-moss text-xs mt-0.5">{timeAgo}</p>
 
         {notification.type === 'friend_request' && onAccept && onReject && (
           <div className="flex gap-2 mt-3">
             <button
               onClick={onReject}
-              className="flex-1 bg-zinc-800 text-zinc-300 rounded-lg py-2 text-xs font-medium hover:bg-zinc-700 transition-colors"
+              className="flex-1 bg-sage text-moss rounded-lg py-2 text-xs font-medium hover:bg-sage-mid transition-colors"
             >
               Decline
             </button>
@@ -61,7 +63,7 @@ function NotificationItem({
         )}
       </div>
       {!notification.read && (
-        <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0 mt-1.5" />
+        <div className="w-2 h-2 rounded-full bg-rally flex-shrink-0 mt-1.5" />
       )}
     </div>
   )
@@ -86,14 +88,14 @@ export default function NotificationsPage() {
   if (loading || !session) return null
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20">
+    <div className="min-h-screen bg-sage text-forest pb-nav">
       <div className="max-w-lg mx-auto px-4">
-        <div className="pt-14 pb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Notifications</h1>
+        <div className="pb-4 flex items-center justify-between" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top))' }}>
+          <h1 className="text-2xl font-display font-bold">Notifications</h1>
           {notifications.some((n) => !n.read) && (
             <button
               onClick={markAllRead}
-              className="text-zinc-400 text-sm hover:text-white transition-colors"
+              className="text-moss text-sm hover:text-forest transition-colors"
             >
               Mark all read
             </button>
@@ -102,7 +104,7 @@ export default function NotificationsPage() {
 
         {notifications.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-zinc-600 text-sm">No notifications yet</p>
+            <p className="text-moss text-sm">No notifications yet</p>
           </div>
         ) : (
           <div className="space-y-2">

@@ -3,8 +3,8 @@ import { supabase } from '@/lib/supabase'
 import { useMapStore } from '@/store/mapStore'
 import type { CheckIn, Park } from '@/lib/types'
 
-export function useRealtimeCheckIns() {
-  const { setParks, setActiveCheckIns, upsertCheckIn, removeCheckIn } = useMapStore()
+export function useRealtimeCheckIns(friendIds: string[] = []) {
+  const { setParks, setActiveCheckIns, upsertCheckIn, removeCheckIn, setPendingToast } = useMapStore()
 
   // Initial load
   useEffect(() => {
@@ -37,7 +37,13 @@ export function useRealtimeCheckIns() {
             .select('*, profile:profiles!user_id(*), park:parks!park_id(*)')
             .eq('id', payload.new.id)
             .single()
-          if (data) upsertCheckIn(data as CheckIn)
+          if (data) {
+            upsertCheckIn(data as CheckIn)
+            // Trigger in-app toast if this is a friend's check-in
+            if (friendIds.includes(payload.new.user_id)) {
+              setPendingToast(data as CheckIn)
+            }
+          }
         }
       )
       .on(

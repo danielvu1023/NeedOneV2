@@ -1,5 +1,6 @@
 import { Marker } from 'react-map-gl'
 import InitialsAvatar from '@/components/InitialsAvatar'
+import { getDisplayName } from '@/lib/profileUtils'
 import type { CheckIn } from '@/lib/types'
 
 interface AvatarHeadProps {
@@ -13,6 +14,7 @@ interface AvatarHeadProps {
 
 export default function AvatarHead({ checkIn, lat, lng, isFriend, isSelf, onClick }: AvatarHeadProps) {
   const profile = checkIn.profile
+  const displayName = getDisplayName(profile)
 
   return (
     <Marker
@@ -41,12 +43,12 @@ export default function AvatarHead({ checkIn, lat, lng, isFriend, isSelf, onClic
           {profile?.avatar_url ? (
             <img
               src={profile.avatar_url}
-              alt={profile.username ?? ''}
+              alt={displayName}
               className="w-full h-full object-cover"
             />
           ) : (
             <InitialsAvatar
-              username={profile?.username ?? '?'}
+              name={displayName}
               userId={checkIn.user_id}
               size={44}
             />

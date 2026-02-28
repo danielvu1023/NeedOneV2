@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState, useEffect } from 'react'
+import { useRef, useCallback, useState, useEffect, useMemo } from 'react'
 import Map, { GeolocateControl, NavigationControl, Marker, type MapRef } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { useMapStore } from '@/store/mapStore'
@@ -43,7 +43,14 @@ export default function MapView() {
   const [selectedCheckIn, setSelectedCheckIn] = useState<CheckIn | null>(null)
   const mapRef = useRef<MapRef>(null)
 
-  useRealtimeCheckIns()
+  const friendIds = useMemo(() => {
+    if (!session) return []
+    return friendships
+      .filter((f) => f.status === 'accepted')
+      .map((f) => f.requester_id === session.user.id ? f.addressee_id : f.requester_id)
+  }, [friendships, session])
+
+  useRealtimeCheckIns(friendIds)
 
   // Fly to park whenever selectedPark changes (handles both pin tap and park list selection)
   useEffect(() => {
@@ -90,7 +97,7 @@ export default function MapView() {
         mapboxAccessToken={MAPBOX_TOKEN}
         initialViewState={INITIAL_VIEW}
         style={{ width: '100%', height: '100%' }}
-        mapStyle="mapbox://styles/mapbox/dark-v11"
+        mapStyle="mapbox://styles/mapbox/light-v11"
         onClick={() => {
           if (selectedPark) { setSelectedPark(null); setSelectedCheckIn(null) }
         }}

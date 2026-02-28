@@ -4,6 +4,8 @@ import { useRouter } from 'next/router'
 import { supabase } from '@/lib/supabase'
 import type { Profile } from '@/lib/types'
 
+const EXEMPT_PATHS = ['/auth', '/profile-setup', '/onboarding']
+
 interface AuthContextType {
   session: Session | null
   profile: Profile | null
@@ -31,7 +33,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .eq('id', userId)
       .single()
     setProfile(data)
-    return data
+    return data as Profile | null
+  }
+
+  function redirectIfNeeded(p: Profile | null, pathname: string) {
+    if (!p || EXEMPT_PATHS.includes(pathname)) return
+    if (!p.first_name) {
+      router.replace('/profile-setup')
+    } else if (!p.onboarding_completed) {
+      router.replace('/onboarding')
+    }
   }
 
   useEffect(() => {
@@ -39,10 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session)
       if (session) {
         const p = await loadProfile(session.user.id)
-        // Redirect to profile setup if username not set
-        if (p && !p.username && router.pathname !== '/profile-setup') {
-          router.replace('/profile-setup')
-        }
+        redirectIfNeeded(p, router.pathname)
       }
       setLoading(false)
     })
@@ -51,8 +59,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session)
       if (session) {
         const p = await loadProfile(session.user.id)
-        if (event === 'SIGNED_IN' && p && !p.username) {
-          router.replace('/profile-setup')
+        if (event === 'SIGNED_IN') {
+          redirectIfNeeded(p, router.pathname)
         }
       } else {
         setProfile(null)
