@@ -4,13 +4,15 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function ProfileSetupPage() {
-  const { session, profile } = useAuth()
+  const { session, profile, refreshProfile } = useAuth()
   const router = useRouter()
   const isEditing = router.query.edit === '1'
   const [firstName, setFirstName] = useState(profile?.first_name ?? '')
   const [lastName, setLastName] = useState(profile?.last_name ?? '')
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(
+    isEditing ? (profile?.avatar_url ?? null) : null
+  )
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -29,7 +31,7 @@ export default function ProfileSetupPage() {
     setError('')
 
     try {
-      let avatar_url: string | null = null
+      let newAvatarUrl: string | null = null
 
       if (avatarFile) {
         const ext = avatarFile.name.split('.').pop()
@@ -39,7 +41,7 @@ export default function ProfileSetupPage() {
           .upload(path, avatarFile, { upsert: true })
         if (uploadError) throw uploadError
         const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path)
-        avatar_url = urlData.publicUrl
+        newAvatarUrl = urlData.publicUrl
       }
 
       const { error: upsertError } = await supabase
@@ -49,11 +51,12 @@ export default function ProfileSetupPage() {
           first_name: firstName.trim(),
           last_name: lastName.trim() || null,
           username: firstName.trim().toLowerCase().replace(/\s+/g, '_'),
-          avatar_url,
+          avatar_url: newAvatarUrl ?? (isEditing ? (profile?.avatar_url ?? null) : null),
         })
 
       if (upsertError) throw upsertError
 
+      await refreshProfile()
       router.replace(isEditing ? '/profile' : '/onboarding')
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong')

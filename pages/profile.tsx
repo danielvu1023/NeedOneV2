@@ -11,10 +11,14 @@ function PermissionRow({
   label,
   state,
   onEnable,
+  requiresStandalone,
+  isStandalone,
 }: {
   label: string
   state: string
   onEnable: () => void
+  requiresStandalone?: boolean
+  isStandalone?: boolean
 }) {
   if (state === 'granted') {
     return (
@@ -47,6 +51,18 @@ function PermissionRow({
     )
   }
 
+  if (requiresStandalone && !isStandalone) {
+    return (
+      <div className="bg-white rounded-xl px-4 py-3.5">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-forest">{label}</span>
+          <span className="text-moss text-xs">Off</span>
+        </div>
+        <p className="text-moss text-xs mt-1.5">Install the app to enable push notifications</p>
+      </div>
+    )
+  }
+
   return (
     <button
       onClick={onEnable}
@@ -64,6 +80,7 @@ export default function ProfilePage() {
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { pushState, locationState, resetDismissed } = usePushPermission()
+  const isStandalone = typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches
 
   useEffect(() => {
     if (!loading && !session) router.replace('/auth')
@@ -160,6 +177,8 @@ export default function ProfilePage() {
               label="Notifications"
               state={pushState}
               onEnable={() => resetDismissed('push')}
+              requiresStandalone
+              isStandalone={isStandalone}
             />
             <PermissionRow
               label="Location"

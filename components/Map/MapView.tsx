@@ -35,21 +35,23 @@ function metresPerDegLng(lat: number) { return 111320 * Math.cos((lat * Math.PI)
  */
 function getCircularAvatarPositions(checkIns: CheckIn[], park: Park) {
   const visible = checkIns.slice(0, MAX_VISIBLE_AVATARS)
-  const n = visible.length
-  if (n === 0) return []
+  if (visible.length === 0) return []
 
+  const n = visible.length
   const dLat = CIRCLE_RADIUS_M / metresPerDegLat()
   const dLng = CIRCLE_RADIUS_M / metresPerDegLng(park.lat)
 
-  // With only 1 avatar, place it directly above the park pin
-  const startAngle = -Math.PI / 2
-
   return visible.map((ci, i) => {
-    const angle = n === 1 ? startAngle : startAngle + (2 * Math.PI * i) / n
+    // Each avatar gets its own angular sector (guarantees no two land in the same spot),
+    // with UUID-seeded radius variation so they're not all on the same ring.
+    const hex = ci.id.replace(/-/g, '')
+    const byte1 = parseInt(hex.slice(2, 4), 16)  // 0–255 → radius
+    const angle = (i / n) * 2 * Math.PI - Math.PI / 2
+    const r = 0.4 + 0.6 * (byte1 / 255)
     return {
       checkIn: ci,
-      lat: park.lat + dLat * Math.sin(angle),
-      lng: park.lng + dLng * Math.cos(angle),
+      lat: park.lat + dLat * r * Math.sin(angle),
+      lng: park.lng + dLng * r * Math.cos(angle),
     }
   })
 }

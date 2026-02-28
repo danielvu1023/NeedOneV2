@@ -7,7 +7,6 @@ import BottomNav from '@/components/BottomNav'
 import NotificationBell from '@/components/NotificationBell'
 import CheckInToast from '@/components/CheckInToast'
 import PermissionModal from '@/components/PermissionModal'
-import FeedbackWidget from '@/components/FeedbackWidget'
 import ParkListSheet from '@/components/Map/ParkListSheet'
 
 const MapView = dynamic(() => import('@/components/Map/MapView'), { ssr: false })
@@ -43,7 +42,15 @@ export default function HomePage() {
         style={{ top: 'max(4.5rem, calc(env(safe-area-inset-top) + 3.5rem))' }}
       >
         <NotificationBell />
-        <FeedbackWidget />
+        <button
+          onClick={() => router.push('/feedback')}
+          className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-sage-mid flex items-center justify-center hover:bg-white transition-colors shadow-sm"
+          aria-label="Send feedback"
+        >
+          <svg style={{ width: 18, height: 18 }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} className="text-forest">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+          </svg>
+        </button>
       </div>
 
       {/* In-app check-in toast */}

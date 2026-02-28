@@ -11,6 +11,7 @@ interface AuthContextType {
   profile: Profile | null
   loading: boolean
   signOut: () => Promise<void>
+  refreshProfile: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -18,6 +19,7 @@ const AuthContext = createContext<AuthContextType>({
   profile: null,
   loading: true,
   signOut: async () => {},
+  refreshProfile: async () => {},
 })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -37,8 +39,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   function redirectIfNeeded(p: Profile | null, pathname: string) {
-    if (!p || EXEMPT_PATHS.includes(pathname)) return
-    if (!p.first_name) {
+    if (EXEMPT_PATHS.includes(pathname)) return
+    if (!p || !p.first_name) {
       router.replace('/profile-setup')
     } else if (!p.onboarding_completed) {
       router.replace('/onboarding')
@@ -55,13 +57,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session)
       if (session) {
-        const p = await loadProfile(session.user.id)
-        if (event === 'SIGNED_IN') {
-          redirectIfNeeded(p, router.pathname)
-        }
+        // Non-async callback — SDK awaits subscribers, so an async callback here
+        // blocks verifyOtp from ever resolving. Use .then() to fire-and-forget.
+        loadProfile(session.user.id).then((p) => {
+          if (event === 'SIGNED_IN') {
+            redirectIfNeeded(p, router.pathname)
+          }
+        })
       } else {
         setProfile(null)
       }
@@ -70,13 +75,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  async function refreshProfile() {
+    const currentSession = (await supabase.auth.getSession()).data.session
+    if (currentSession) await loadProfile(currentSession.user.id)
+  }
+
   async function signOut() {
     await supabase.auth.signOut()
     router.replace('/auth')
   }
 
   return (
-    <AuthContext.Provider value={{ session, profile, loading, signOut }}>
+    <AuthContext.Provider value={{ session, profile, loading, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   )

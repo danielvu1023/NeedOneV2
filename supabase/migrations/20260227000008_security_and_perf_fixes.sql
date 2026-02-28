@@ -94,8 +94,6 @@ create policy "notifications_update_own"
 alter function public.handle_new_user() set search_path = public;
 alter function public.handle_friend_request() set search_path = public;
 alter function public.handle_friend_accepted() set search_path = public;
-alter function public.get_friend_ids(uuid) set search_path = public;
-alter function public.get_court_peers(uuid) set search_path = public;
 
 -- ============================================================
 -- Fix 4: Add indexes on unindexed foreign keys
