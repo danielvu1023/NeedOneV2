@@ -8,8 +8,7 @@ export default function NotificationBell() {
   return (
     <button
       onClick={() => router.push('/notifications')}
-      className="absolute right-4 z-20 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-sage-mid flex items-center justify-center hover:bg-white transition-colors shadow-sm"
-      style={{ top: 'max(1rem, env(safe-area-inset-top))' }}
+      className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-sage-mid flex items-center justify-center hover:bg-white transition-colors shadow-sm"
       aria-label="Notifications"
     >
       <svg className="w-5 h-5 text-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>

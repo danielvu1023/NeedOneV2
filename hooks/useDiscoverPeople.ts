@@ -1,31 +1,35 @@
-import { useState, useMemo } from 'react'
-import useSWR from 'swr'
+import { useState, useMemo, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 import { useFriendships } from '@/hooks/useFriendships'
 import { getDisplayName } from '@/lib/profileUtils'
 import type { Profile } from '@/lib/types'
 
-async function fetchAllProfiles(): Promise<Profile[]> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('id, first_name, last_name, avatar_url')
-    .not('first_name', 'is', null)
-    .order('first_name')
-    .limit(500)
-  if (error) throw error
-  return data ?? []
-}
-
 export function useDiscoverPeople() {
   const { session } = useAuth()
   const { friendships } = useFriendships()
   const [search, setSearch] = useState('')
+  const [allProfiles, setAllProfiles] = useState<Profile[]>([])
+  const [loading, setLoading] = useState(false)
 
-  const { data: allProfiles, isLoading } = useSWR(
-    session ? 'discover_people' : null,
-    fetchAllProfiles
-  )
+  useEffect(() => {
+    if (!session) return
+    let cancelled = false
+    setLoading(true)
+    supabase
+      .from('profiles')
+      .select('id, first_name, last_name, avatar_url')
+      .order('first_name')
+      .limit(500)
+      .then(({ data }) => {
+        if (!cancelled) setAllProfiles(data ?? [])
+      })
+      .catch(() => {}) // silently show empty list on error
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [session?.user.id])
 
   const connectedIds = useMemo(() => {
     const ids = new Set<string>()
@@ -47,5 +51,5 @@ export function useDiscoverPeople() {
     })
   }, [allProfiles, connectedIds, search])
 
-  return { people, loading: isLoading, search, setSearch }
+  return { people, loading, search, setSearch }
 }

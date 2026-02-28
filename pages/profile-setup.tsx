@@ -4,10 +4,11 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function ProfileSetupPage() {
-  const { session } = useAuth()
+  const { session, profile } = useAuth()
   const router = useRouter()
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
+  const isEditing = router.query.edit === '1'
+  const [firstName, setFirstName] = useState(profile?.first_name ?? '')
+  const [lastName, setLastName] = useState(profile?.last_name ?? '')
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -53,7 +54,7 @@ export default function ProfileSetupPage() {
 
       if (upsertError) throw upsertError
 
-      router.replace('/onboarding')
+      router.replace(isEditing ? '/profile' : '/onboarding')
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
@@ -64,8 +65,21 @@ export default function ProfileSetupPage() {
   return (
     <div className="min-h-screen bg-sage flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-sm">
+        {isEditing && (
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-1.5 text-moss hover:text-forest transition-colors mb-6 -ml-1"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="text-sm font-medium">Back</span>
+          </button>
+        )}
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-display font-bold text-forest">What&apos;s your name?</h1>
+          <h1 className="text-2xl font-display font-bold text-forest">
+            {isEditing ? 'Edit profile' : "What's your name?"}
+          </h1>
           <p className="text-moss text-sm mt-1">How you&apos;ll appear on the map</p>
         </div>
 

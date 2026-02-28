@@ -7,6 +7,7 @@ import BottomNav from '@/components/BottomNav'
 import NotificationBell from '@/components/NotificationBell'
 import CheckInToast from '@/components/CheckInToast'
 import PermissionModal from '@/components/PermissionModal'
+import FeedbackWidget from '@/components/FeedbackWidget'
 import ParkListSheet from '@/components/Map/ParkListSheet'
 
 const MapView = dynamic(() => import('@/components/Map/MapView'), { ssr: false })
@@ -36,8 +37,14 @@ export default function HomePage() {
         <MapView />
       </div>
 
-      {/* Top-right: notification bell */}
-      <NotificationBell />
+      {/* Top-right controls: vertically stacked, below check-in chip zone */}
+      <div
+        className="absolute right-4 z-20 flex flex-col gap-2"
+        style={{ top: 'max(4.5rem, calc(env(safe-area-inset-top) + 3.5rem))' }}
+      >
+        <NotificationBell />
+        <FeedbackWidget />
+      </div>
 
       {/* In-app check-in toast */}
       <CheckInToast />

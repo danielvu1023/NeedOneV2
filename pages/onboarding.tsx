@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useFriendships } from '@/hooks/useFriendships'
 import { useDiscoverPeople } from '@/hooks/useDiscoverPeople'
 import InitialsAvatar from '@/components/InitialsAvatar'
+import InstallBanner from '@/components/InstallBanner'
 import { getDisplayName } from '@/lib/profileUtils'
 
 export default function OnboardingPage() {
@@ -59,6 +60,9 @@ export default function OnboardingPage() {
         <h1 className="text-3xl font-display font-bold text-forest leading-tight">Find your fourth.</h1>
         <p className="text-moss text-sm mt-2">See who&apos;s already on NeedOne</p>
       </div>
+
+      {/* PWA install nudge */}
+      <InstallBanner />
 
       {/* Search */}
       <div className="px-6 mb-4">

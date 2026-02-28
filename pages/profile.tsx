@@ -132,7 +132,7 @@ export default function ProfilePage() {
         {/* Settings */}
         <div className="space-y-2 mb-8">
           <button
-            onClick={() => router.push('/profile-setup')}
+            onClick={() => router.push('/profile-setup?edit=1')}
             className="w-full flex items-center justify-between bg-white rounded-xl px-4 py-3.5 hover:bg-sage-mid transition-colors"
           >
             <span className="text-sm text-forest">Edit profile</span>

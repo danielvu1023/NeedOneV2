@@ -1,5 +1,5 @@
 import { useRef, useCallback, useState, useEffect, useMemo } from 'react'
-import Map, { GeolocateControl, NavigationControl, Marker, type MapRef } from 'react-map-gl'
+import Map, { GeolocateControl, NavigationControl, Marker, Source, Layer, type MapRef } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { useMapStore } from '@/store/mapStore'
 import { useRealtimeCheckIns } from '@/hooks/useRealtimeCheckIns'
@@ -10,7 +10,6 @@ import ParkPin from './ParkPin'
 import AvatarHead from './AvatarHead'
 import ParkCard from './ParkCard'
 import CheckInChip from './CheckInChip'
-import UserBottomSheet from './UserBottomSheet'
 import type { Park, CheckIn } from '@/lib/types'
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
@@ -21,25 +20,71 @@ const INITIAL_VIEW = {
   zoom: 15,
 }
 
-const MAX_VISIBLE_AVATARS = 5
-const AVATAR_SPACING_LNG = 0.00022
-const AVATAR_OFFSET_LAT = 0.00042
+const MAX_VISIBLE_AVATARS = 6
+// Radius in metres for the avatar circle around a park
+const CIRCLE_RADIUS_M = 120
 
-function getAvatarPositions(checkIns: CheckIn[], park: Park) {
+// Degrees per metre at a given latitude
+function metresPerDegLat() { return 111320 }
+function metresPerDegLng(lat: number) { return 111320 * Math.cos((lat * Math.PI) / 180) }
+
+/**
+ * Distribute up to MAX_VISIBLE_AVATARS check-ins evenly around a geographic
+ * circle of CIRCLE_RADIUS_M centred on the park.
+ * Start angle: top (−π/2), going clockwise.
+ */
+function getCircularAvatarPositions(checkIns: CheckIn[], park: Park) {
   const visible = checkIns.slice(0, MAX_VISIBLE_AVATARS)
   const n = visible.length
-  return visible.map((ci, i) => ({
-    checkIn: ci,
-    lat: park.lat + AVATAR_OFFSET_LAT,
-    lng: park.lng + (i - (n - 1) / 2) * AVATAR_SPACING_LNG,
-  }))
+  if (n === 0) return []
+
+  const dLat = CIRCLE_RADIUS_M / metresPerDegLat()
+  const dLng = CIRCLE_RADIUS_M / metresPerDegLng(park.lat)
+
+  // With only 1 avatar, place it directly above the park pin
+  const startAngle = -Math.PI / 2
+
+  return visible.map((ci, i) => {
+    const angle = n === 1 ? startAngle : startAngle + (2 * Math.PI * i) / n
+    return {
+      checkIn: ci,
+      lat: park.lat + dLat * Math.sin(angle),
+      lng: park.lng + dLng * Math.cos(angle),
+    }
+  })
+}
+
+/**
+ * Build a GeoJSON FeatureCollection with one circle polygon per park.
+ * Each feature carries a `selected` property so the layer can style it differently.
+ */
+function buildAllParksGeoJSON(parks: Park[], selectedParkId: string | null, radiusM: number, steps = 64): GeoJSON.FeatureCollection {
+  const features: GeoJSON.Feature[] = parks.map((park) => {
+    const dLat = radiusM / metresPerDegLat()
+    const dLng = radiusM / metresPerDegLng(park.lat)
+    const coords: [number, number][] = []
+    for (let i = 0; i <= steps; i++) {
+      const angle = (2 * Math.PI * i) / steps
+      coords.push([
+        park.lng + dLng * Math.cos(angle),
+        park.lat + dLat * Math.sin(angle),
+      ])
+    }
+    return {
+      type: 'Feature',
+      geometry: { type: 'Polygon', coordinates: [coords] },
+      properties: { selected: park.id === selectedParkId },
+    }
+  })
+  return { type: 'FeatureCollection', features }
 }
 
 export default function MapView() {
   const { session } = useAuth()
   const { parks, activeCheckIns, selectedPark, setSelectedPark } = useMapStore()
   const { currentCheckIn, checkIn, checkOut } = useCheckIn()
-  const { sendRequest, friendships } = useFriendships()
+  const { friendships } = useFriendships()
+  // selectedCheckIn drives the player detail view inside ParkCard
   const [selectedCheckIn, setSelectedCheckIn] = useState<CheckIn | null>(null)
   const mapRef = useRef<MapRef>(null)
 
@@ -52,7 +97,10 @@ export default function MapView() {
 
   useRealtimeCheckIns(friendIds)
 
-  // Fly to park whenever selectedPark changes (handles both pin tap and park list selection)
+  useEffect(() => {
+    if (!selectedPark) setSelectedCheckIn(null)
+  }, [selectedPark])
+
   useEffect(() => {
     if (!selectedPark) return
     mapRef.current?.flyTo({
@@ -68,6 +116,7 @@ export default function MapView() {
     setSelectedPark(park)
   }, [setSelectedPark])
 
+  // Avatar head tap: open the park card (if needed) then jump to player view
   const handleAvatarClick = useCallback((checkIn: CheckIn) => {
     setSelectedCheckIn(checkIn)
   }, [])
@@ -87,8 +136,16 @@ export default function MapView() {
   }
 
   const selectedParkCheckIns = selectedPark ? checkInsForPark(selectedPark.id) : []
-  const avatarPositions = selectedPark ? getAvatarPositions(selectedParkCheckIns, selectedPark) : []
+  const avatarPositions = selectedPark ? getCircularAvatarPositions(selectedParkCheckIns, selectedPark) : []
   const overflowCount = selectedParkCheckIns.length - MAX_VISIBLE_AVATARS
+
+  const circleGeoJSON = useMemo(
+    () => parks.length > 0
+      ? buildAllParksGeoJSON(parks, selectedPark?.id ?? null, CIRCLE_RADIUS_M)
+      : null,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [parks, selectedPark?.id]
+  )
 
   return (
     <div className="relative w-full h-full">
@@ -106,7 +163,6 @@ export default function MapView() {
         <NavigationControl position="bottom-right" showCompass={false} />
 
         {parks.map((park) => (
-          // Hide the selected park's pin — avatars take focus when zoomed in
           selectedPark?.id === park.id ? null : (
             <ParkPin
               key={park.id}
@@ -116,6 +172,29 @@ export default function MapView() {
             />
           )
         ))}
+
+        {/* Circles around all parks — brighter when selected */}
+        {circleGeoJSON && (
+          <Source id="park-rings" type="geojson" data={circleGeoJSON}>
+            <Layer
+              id="park-ring-fill"
+              type="fill"
+              paint={{
+                'fill-color': '#22c55e',
+                'fill-opacity': ['case', ['get', 'selected'], 0.09, 0.04],
+              }}
+            />
+            <Layer
+              id="park-ring-line"
+              type="line"
+              paint={{
+                'line-color': '#22c55e',
+                'line-width': ['case', ['get', 'selected'], 1.8, 1],
+                'line-opacity': ['case', ['get', 'selected'], 0.45, 0.2],
+              }}
+            />
+          </Source>
+        )}
 
         {avatarPositions.map(({ checkIn: ci, lat, lng }) => (
           <AvatarHead
@@ -129,21 +208,18 @@ export default function MapView() {
           />
         ))}
 
-        {selectedPark && overflowCount > 0 && (() => {
-          const n = Math.min(selectedParkCheckIns.length, MAX_VISIBLE_AVATARS)
-          const overflowLng = selectedPark.lng + (n - (n - 1) / 2) * AVATAR_SPACING_LNG
-          return (
-            <Marker
-              longitude={overflowLng}
-              latitude={selectedPark.lat + AVATAR_OFFSET_LAT}
-              anchor="bottom"
-            >
-              <div className="w-11 h-11 rounded-full bg-zinc-700 border-2 border-white shadow-lg flex items-center justify-center">
-                <span className="text-white text-xs font-bold">+{overflowCount}</span>
-              </div>
-            </Marker>
-          )
-        })()}
+        {/* Overflow badge sits at the park centre */}
+        {selectedPark && overflowCount > 0 && (
+          <Marker
+            longitude={selectedPark.lng}
+            latitude={selectedPark.lat}
+            anchor="center"
+          >
+            <div className="w-11 h-11 rounded-full bg-zinc-700 border-2 border-white shadow-lg flex items-center justify-center">
+              <span className="text-white text-xs font-bold">+{overflowCount}</span>
+            </div>
+          </Marker>
+        )}
       </Map>
 
       {currentCheckIn && (
@@ -158,15 +234,9 @@ export default function MapView() {
         onCheckIn={() => selectedPark && checkIn(selectedPark.id)}
         onCheckOut={checkOut}
         onClose={() => { setSelectedPark(null); setSelectedCheckIn(null) }}
-        hidden={!!selectedCheckIn}
-      />
-
-      <UserBottomSheet
-        checkIn={selectedCheckIn}
-        onClose={() => { setSelectedCheckIn(null); setSelectedPark(null) }}
-        onBack={() => setSelectedCheckIn(null)}
-        onAddFriend={sendRequest}
-        friendStatus={selectedCheckIn ? getFriendStatus(selectedCheckIn.user_id) : 'none'}
+        selectedCheckIn={selectedCheckIn}
+        onPlayerTap={handleAvatarClick}
+        onBackFromPlayer={() => setSelectedCheckIn(null)}
       />
     </div>
   )

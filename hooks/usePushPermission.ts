@@ -23,8 +23,12 @@ function readStoredState(stateKey: string, dismissedKey: string): PermissionStat
 
 export function usePushPermission() {
   const { session } = useAuth()
-  const [pushState, setPushState] = useState<PermissionState>('unknown')
-  const [locationState, setLocationState] = useState<PermissionState>('unknown')
+  const [pushState, setPushState] = useState<PermissionState>(() =>
+    readStoredState(PUSH_STATE_KEY, PUSH_DISMISSED_KEY)
+  )
+  const [locationState, setLocationState] = useState<PermissionState>(() =>
+    readStoredState(LOCATION_STATE_KEY, LOCATION_DISMISSED_KEY)
+  )
   const [subscribing, setSubscribing] = useState(false)
 
   useEffect(() => {

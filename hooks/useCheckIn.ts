@@ -67,12 +67,30 @@ export function useCheckIn() {
   }
 
   async function checkOut() {
-    if (!session || !currentCheckIn) return
+    if (!session || !currentCheckIn) {
+      console.warn('[checkOut] skipped — session:', !!session, 'currentCheckIn:', !!currentCheckIn)
+      return
+    }
+    const snapshot = currentCheckIn
+    // Optimistic: clear UI immediately so the chip disappears without waiting for DB
+    setCurrentCheckIn(null)
+    removeCheckIn(snapshot.id)
     setLoading(true)
     try {
-      await supabase.from('check_ins').delete().eq('user_id', session.user.id)
-      removeCheckIn(currentCheckIn.id) // immediately remove from map
-      setCurrentCheckIn(null)
+      const { error } = await supabase
+        .from('check_ins')
+        .delete()
+        .eq('user_id', session.user.id)
+      if (error) {
+        console.error('[checkOut] delete error:', error)
+        // Restore state so user can try again
+        setCurrentCheckIn(snapshot)
+        upsertCheckIn(snapshot)
+      }
+    } catch (err) {
+      console.error('[checkOut] unexpected error:', err)
+      setCurrentCheckIn(snapshot)
+      upsertCheckIn(snapshot)
     } finally {
       setLoading(false)
     }

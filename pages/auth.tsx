@@ -29,7 +29,7 @@ export default function AuthPage() {
     <div className="min-h-screen bg-sage flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-sm">
         <div className="mb-10 text-center">
-          <h1 className="text-4xl font-display font-black text-forest tracking-tight">needone</h1>
+          <h1 className="text-4xl font-display font-black text-forest tracking-tight">NeedOne</h1>
           <p className="text-moss mt-2 text-sm">find who&apos;s at the park</p>
         </div>
 
