@@ -1,3 +1,51 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ── Base ─────────────────────────────────────────────────── */
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background-color: #EFF5E4;
+    color: #0D1F0A;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ── Safe-area utilities (PWA / notch support) ────────────── */
+@layer utilities {
+  /* Bottom nav & fixed bottom sheets */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  .pb-safe-lg {
+    padding-bottom: max(2rem, env(safe-area-inset-bottom));
+  }
+  /* Status bar / notch */
+  .pt-safe {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+  /* Bottom nav height accounts for safe area */
+  .h-nav {
+    height: calc(4rem + env(safe-area-inset-bottom));
+  }
+  /* Clearance for content above fixed bottom nav */
+  .pb-nav {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* ── Mapbox cursor visibility on light map ────────────────── */
+.mapboxgl-canvas-container.mapboxgl-interactive,
+.mapboxgl-canvas-container.mapboxgl-interactive .mapboxgl-canvas {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='5' fill='%230D1F0A' fill-opacity='0.8'/%3E%3Ccircle cx='12' cy='12' r='4' fill='white'/%3E%3C/svg%3E") 12 12, crosshair;
+}

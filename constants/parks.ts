@@ -9,8 +9,8 @@ export const PARKS: Park[] = [
   {
     id: 'hollenbeck',
     name: 'Hollenbeck Park',
-    lat: 34.0435,
-    lng: -118.2087,
+    lat: 34.10202438,
+    lng: -117.89793372,
   },
   {
     id: 'elysian',
