@@ -65,7 +65,8 @@ export default function FeedbackPage() {
   }
 
   return (
-    <div className="min-h-screen bg-sage text-forest pb-nav">
+    <div className="flex flex-col bg-sage text-forest" style={{ height: '100dvh' }}>
+      <div className="flex-1 overflow-y-auto">
       <div className="max-w-lg mx-auto px-4">
         <div className="pb-6 flex items-center gap-3" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top))' }}>
           <button
@@ -144,6 +145,7 @@ export default function FeedbackPage() {
             </button>
           </form>
         )}
+      </div>
       </div>
 
       <BottomNav />

@@ -2,6 +2,30 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 
+// ─── iOS detection helpers ────────────────────────────────────────────────────
+// On iOS every browser (Chrome, Firefox, Edge) is a WebKit wrapper — the
+// Notification API is only available in Safari, and only when the PWA is
+// installed to the Home Screen (standalone mode).
+
+function isIOS(): boolean {
+  if (typeof navigator === 'undefined') return false
+  return /iphone|ipad|ipod/i.test(navigator.userAgent)
+}
+
+function isIOSSafari(): boolean {
+  if (typeof navigator === 'undefined') return false
+  const ua = navigator.userAgent
+  // CriOS = Chrome on iOS, FxiOS = Firefox on iOS, EdgiOS = Edge on iOS
+  return isIOS() && /safari/i.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/i.test(ua)
+}
+
+function isStandalone(): boolean {
+  if (typeof window === 'undefined') return false
+  // navigator.standalone is iOS Safari-specific
+  return !!(window.navigator as Navigator & { standalone?: boolean }).standalone
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 function urlBase64ToUint8Array(base64String: string): ArrayBuffer {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
@@ -42,9 +66,20 @@ export function usePushPermission() {
   )
   const [subscribing, setSubscribing] = useState(false)
 
+  // iOS context — set once on mount (client-only)
+  const [iosContext, setIosContext] = useState<{
+    isIOS: boolean
+    isSafari: boolean
+    isStandalone: boolean
+  }>({ isIOS: false, isSafari: false, isStandalone: false })
+
+  useEffect(() => {
+    setIosContext({ isIOS: isIOS(), isSafari: isIOSSafari(), isStandalone: isStandalone() })
+  }, [])
+
   useEffect(() => {
     // Sync actual browser permission state
-    if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+    if (typeof Notification === 'undefined' || !('serviceWorker' in navigator)) {
       setPushState('unsupported')
     } else {
       const actual = Notification.permission
@@ -82,7 +117,7 @@ export function usePushPermission() {
   }, [])
 
   async function requestPush() {
-    if (!session || !('Notification' in window)) return
+    if (!session || typeof Notification === 'undefined') return
     setSubscribing(true)
     try {
       const permission = await Notification.requestPermission()
@@ -182,6 +217,7 @@ export function usePushPermission() {
     pushState,
     locationState,
     subscribing,
+    iosContext,
     requestPermission,
     requestPush,
     requestLocation,

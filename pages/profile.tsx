@@ -75,7 +75,7 @@ function PermissionRow({
 }
 
 export default function ProfilePage() {
-  const { session, profile, loading, signOut } = useAuth()
+  const { session, profile, loading, authError, signOut } = useAuth()
   const router = useRouter()
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -102,12 +102,38 @@ export default function ProfilePage() {
     }
   }
 
-  if (loading || !session || !profile) return null
+  if (loading) return (
+    <div className="min-h-screen bg-sage flex flex-col items-center justify-center gap-2">
+      <div className="w-6 h-6 border-2 border-sage-mid border-t-forest rounded-full animate-spin" />
+      <p className="text-xs text-moss font-mono">loading session…</p>
+    </div>
+  )
+  if (!session) return (
+    <div className="min-h-screen bg-sage flex flex-col items-center justify-center gap-2">
+      <p className="text-xs text-moss font-mono">no session — redirecting…</p>
+    </div>
+  )
+  if (!profile) return (
+    <div className="min-h-screen bg-sage flex flex-col items-center justify-center gap-2">
+      {authError ? (
+        <>
+          <p className="text-xs text-rally font-mono px-6 text-center">{authError}</p>
+          <a href="/diagnostics" className="text-xs text-moss underline font-mono">diagnostics</a>
+        </>
+      ) : (
+        <>
+          <div className="w-6 h-6 border-2 border-sage-mid border-t-forest rounded-full animate-spin" />
+          <p className="text-xs text-moss font-mono">loading profile…</p>
+        </>
+      )}
+    </div>
+  )
 
   const displayName = getDisplayName(profile)
 
   return (
-    <div className="min-h-screen bg-sage text-forest pb-nav">
+    <div className="flex flex-col bg-sage text-forest" style={{ height: '100dvh' }}>
+      <div className="flex-1 overflow-y-auto">
       <div className="max-w-lg mx-auto px-4">
         <div className="pb-6" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top))' }}>
           <h1 className="text-2xl font-display font-bold">Profile</h1>
@@ -197,6 +223,17 @@ export default function ProfilePage() {
             Sign out
           </button>
         </div>
+
+        {/* TODO: remove — dev only */}
+        <div className="mt-6 pt-4 border-t border-sage-mid">
+          <a
+            href="/push-test"
+            className="block w-full text-center bg-yellow-100 border border-yellow-300 text-yellow-800 rounded-xl py-3 text-xs font-mono"
+          >
+            🔔 Push Notification Test (dev only)
+          </a>
+        </div>
+      </div>
       </div>
 
       <BottomNav />

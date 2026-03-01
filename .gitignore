@@ -44,3 +44,4 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+.push-test-subscriptions.json

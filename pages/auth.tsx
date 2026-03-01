@@ -1,5 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { supabase } from '@/lib/supabase'
+import { logError } from '@/lib/errorLog'
+
 
 export default function AuthPage() {
   const [step, setStep] = useState<'email' | 'code'>('email')
@@ -7,6 +10,10 @@ export default function AuthPage() {
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [loadTime, setLoadTime] = useState('')
+  const router = useRouter()
+
+  useEffect(() => { setLoadTime(new Date().toLocaleTimeString('en-US', { hour12: false })) }, [])
 
   async function handleSendCode(e: React.FormEvent) {
     e.preventDefault()
@@ -34,12 +41,21 @@ export default function AuthPage() {
         token: code,
         type: 'email',
       })
-      console.log('[auth] verifyOtp result:', { error, session: data?.session })
+      console.log('[auth] verifyOtp result:', { error, session: data?.session?.user?.id })
       if (error) {
+        logError('auth', 'verifyOtp error', error.message)
         setError(error.message)
         setLoading(false)
+      } else if (!data.session) {
+        const msg = 'Verification succeeded but no session returned — try sending a new code'
+        logError('auth', 'verifyOtp no session', { user: data.user?.id })
+        setError(msg)
+        setLoading(false)
       } else {
-        window.location.href = '/'
+        // Use soft navigation so the session already in React state (set by
+        // onAuthStateChange SIGNED_IN) carries over — avoids the Safari timing
+        // issue where a hard reload re-reads localStorage before the write is durable.
+        router.replace('/')
       }
     } catch (err) {
       console.error('[auth] verifyOtp threw:', err)
@@ -134,6 +150,23 @@ export default function AuthPage() {
             </p>
           </form>
         )}
+      </div>
+
+      {/* TODO: remove — dev only */}
+      <div className="fixed bottom-4 right-4 flex flex-col items-end gap-2">
+        <span className="text-xs font-mono text-moss/50">{loadTime}</span>
+        <a
+          href="/diagnostics"
+          className="text-xs font-mono text-moss bg-yellow-100 border border-yellow-300 px-3 py-1.5 rounded-lg"
+        >
+          🔍 diagnostics
+        </a>
+        <a
+          href="/push-test"
+          className="text-xs font-mono text-moss bg-yellow-100 border border-yellow-300 px-3 py-1.5 rounded-lg"
+        >
+          🔔 push test
+        </a>
       </div>
     </div>
   )

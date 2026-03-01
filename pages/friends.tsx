@@ -67,7 +67,8 @@ export default function FriendsPage() {
   if (loading || !session) return null
 
   return (
-    <div className="min-h-screen bg-sage text-forest pb-nav">
+    <div className="flex flex-col bg-sage text-forest" style={{ height: '100dvh' }}>
+      <div className="flex-1 overflow-y-auto">
       <div className="max-w-lg mx-auto px-4">
         <div className="pb-4" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top))' }}>
           <h1 className="text-2xl font-display font-bold mb-4">Friends</h1>
@@ -231,6 +232,7 @@ export default function FriendsPage() {
             )}
           </section>
         </div>
+      </div>
       </div>
 
       <BottomNav />

@@ -11,8 +11,13 @@ alter publication supabase_realtime add table public.notifications;
 -- pg_cron: delete expired check-ins every minute
 -- Fires Realtime DELETE events so clients remove stale markers
 -- ------------------------------------------------------------
-select cron.schedule(
-  'delete-expired-checkins',
-  '* * * * *',
-  'delete from public.check_ins where expires_at <= now()'
-);
+do $$
+begin
+  if exists (select 1 from pg_extension where extname = 'pg_cron') then
+    perform cron.schedule(
+      'delete-expired-checkins',
+      '* * * * *',
+      'delete from public.check_ins where expires_at <= now()'
+    );
+  end if;
+end $$;

@@ -14,6 +14,9 @@ export default function PushPrompt() {
     setDismissed(true)
   }
 
+  // TODO: re-enable once push is fully integrated
+  return null
+  // eslint-disable-next-line no-unreachable
   if (dismissed || state !== 'unknown') return null
 
   return (
