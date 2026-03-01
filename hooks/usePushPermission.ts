@@ -2,6 +2,17 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+  const rawData = window.atob(base64)
+  const outputArray = new Uint8Array(rawData.length)
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i)
+  }
+  return outputArray
+}
+
 export type PermissionState = 'unknown' | 'granted' | 'blocked' | 'dismissed' | 'unsupported'
 
 const PUSH_STATE_KEY = 'push_permission_state'
@@ -92,15 +103,18 @@ export function usePushPermission() {
 
       const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: vapidKey,
+        applicationServerKey: urlBase64ToUint8Array(vapidKey),
       })
       const json = sub.toJSON()
-      if (!json.keys) return
+      if (!json.keys) {
+        console.error('Push subscription missing keys')
+        return
+      }
 
       const { data: { session: currentSession } } = await supabase.auth.getSession()
       if (!currentSession) return
 
-      await fetch('/api/push/subscribe', {
+      const res = await fetch('/api/push/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,6 +122,11 @@ export function usePushPermission() {
         },
         body: JSON.stringify({ endpoint: sub.endpoint, keys: json.keys }),
       })
+      if (!res.ok) {
+        console.error('Failed to save push subscription', await res.text())
+      }
+    } catch (err) {
+      console.error('Push subscription error:', err)
     } finally {
       setSubscribing(false)
     }
