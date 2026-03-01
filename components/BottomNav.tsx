@@ -71,7 +71,7 @@ export default function BottomNav({ onParkListOpen }: BottomNavProps) {
               <span className={`text-[10px] font-display font-bold tracking-wide ${active ? 'text-forest' : 'text-moss'}`}>
                 {tab.label}
               </span>
-              {active && <span className="w-1 h-1 rounded-full bg-green-500" />}
+              {active && <span className="w-1 h-1 rounded-full bg-court" />}
             </button>
           )
         })}

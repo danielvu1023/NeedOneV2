@@ -13,13 +13,13 @@ export default function CheckInChip({ checkIn, onCheckOut }: CheckInChipProps) {
       className="absolute left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 bg-forest/90 backdrop-blur-sm border border-forest rounded-full px-4 py-2.5 shadow-xl"
       style={{ top: 'max(1rem, env(safe-area-inset-top))' }}
     >
-      <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-      <span className="text-white text-sm font-medium whitespace-nowrap">
+      <div className="w-2 h-2 rounded-full bg-court animate-pulse" />
+      <span className="text-court text-sm font-medium whitespace-nowrap">
         {parkName}
       </span>
       <button
         onClick={onCheckOut}
-        className="ml-1 text-white/50 hover:text-white transition-colors"
+        className="ml-1 text-court/50 hover:text-court transition-colors"
         aria-label="Check out"
       >
         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
