@@ -8,6 +8,7 @@ import NotificationBell from '@/components/NotificationBell'
 import CheckInToast from '@/components/CheckInToast'
 import PermissionModal from '@/components/PermissionModal'
 import ParkListSheet from '@/components/Map/ParkListSheet'
+import PushPrompt from '@/components/PushPrompt'
 
 const MapView = dynamic(() => import('@/components/Map/MapView'), { ssr: false })
 
@@ -52,6 +53,9 @@ export default function HomePage() {
           </svg>
         </button>
       </div>
+
+      {/* Push notification permission prompt */}
+      <PushPrompt />
 
       {/* In-app check-in toast */}
       <CheckInToast />

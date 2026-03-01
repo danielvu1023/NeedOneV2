@@ -12,7 +12,9 @@ node_modules/
 
 # next-pwa generated service worker (auto-generated at build time)
 /public/sw.js
+/public/sw.js.map
 /public/workbox-*.js
+/public/workbox-*.js.map
 /public/worker-*.js
 
 # production
