@@ -45,7 +45,7 @@ export default function CheckInToast() {
             {displayName}
           </p>
           <p className="text-moss text-xs mt-0.5 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block flex-shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-court inline-block flex-shrink-0" />
             Checked in at {parkName}
           </p>
         </div>
