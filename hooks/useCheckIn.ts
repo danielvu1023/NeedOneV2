@@ -61,6 +61,19 @@ export function useCheckIn() {
       const ci = data as CheckIn
       setCurrentCheckIn(ci)
       upsertCheckIn(ci) // immediately show on map without waiting for Realtime
+
+      // fire-and-forget — notify friends of check-in
+      supabase.auth.getSession().then(({ data: { session: s } }) => {
+        if (!s) return
+        fetch('/api/checkin/notify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${s.access_token}`,
+          },
+          body: JSON.stringify({ parkId }),
+        })
+      })
     } finally {
       setLoading(false)
     }
