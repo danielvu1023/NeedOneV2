@@ -33,7 +33,7 @@ export default function HomePage() {
   return (
     <div className="fixed inset-0 bg-sage">
       {/* Full-screen map */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0" style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom))' }}>
         <MapView />
       </div>
 
