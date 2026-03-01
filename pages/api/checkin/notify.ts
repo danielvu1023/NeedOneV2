@@ -45,13 +45,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Fetch accepted friends
   const { data: friendships } = await supabaseServer
     .from('friendships')
-    .select('user_id, friend_id')
-    .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
+    .select('requester_id, addressee_id')
+    .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`)
     .eq('status', 'accepted')
 
   if (!friendships || friendships.length === 0) return res.status(200).json({ notified: 0 })
 
-  const friendIds = friendships.map((f) => f.user_id === userId ? f.friend_id : f.user_id)
+  const friendIds = friendships.map((f) => f.requester_id === userId ? f.addressee_id : f.requester_id)
 
   const title = `${actorName.slice(0, 50)} is at ${parkName.slice(0, 50)}`
   const body = 'They just checked in'
