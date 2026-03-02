@@ -31,6 +31,11 @@ function detectIOS() {
   return { isIOS, isStandalone }
 }
 
+export function getServerSideProps() {
+  if (process.env.NODE_ENV === 'production') return { notFound: true }
+  return { props: {} }
+}
+
 export default function PushTestPage() {
   const { session, loading: authLoading } = useAuth()
   const [steps, setSteps] = useState<Step[]>([

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
+import { logError } from '@/lib/errorLog'
 
 // ─── iOS detection helpers ────────────────────────────────────────────────────
 // On iOS every browser (Chrome, Firefox, Edge) is a WebKit wrapper — the
@@ -86,6 +87,33 @@ export function usePushPermission() {
       if (actual === 'granted') {
         setPushState('granted')
         localStorage.setItem(PUSH_STATE_KEY, 'granted')
+        // Auto-restore: if permission was already granted (e.g. fresh session, cleared localStorage),
+        // re-register push-sw.js and re-save the subscription to DB if one exists.
+        ;(async () => {
+          try {
+            const reg = await navigator.serviceWorker.register('/push-sw.js', { scope: '/push-scope/' })
+            const existing = await reg.pushManager.getSubscription()
+            if (existing) {
+              logError('push', 'auto-restore: found existing sub on load', existing.endpoint.slice(0, 40))
+              const json = existing.toJSON()
+              if (!json.keys) return
+              const { data: { session } } = await supabase.auth.getSession()
+              if (!session) return
+              await fetch('/api/push/subscribe', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${session.access_token}`,
+                },
+                body: JSON.stringify({ endpoint: existing.endpoint, keys: json.keys }),
+              })
+            } else {
+              logError('push', 'auto-restore: no existing sub')
+            }
+          } catch {
+            // Silently ignore — auto-restore is best-effort
+          }
+        })()
       } else if (actual === 'denied') {
         setPushState('blocked')
         localStorage.setItem(PUSH_STATE_KEY, 'blocked')
@@ -129,20 +157,32 @@ export function usePushPermission() {
       setPushState('granted')
       localStorage.setItem(PUSH_STATE_KEY, 'granted')
 
-      const reg = await navigator.serviceWorker.ready
       const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
       if (!vapidKey) {
-        console.warn('NEXT_PUBLIC_VAPID_PUBLIC_KEY not set — push subscription skipped')
+        logError('push', 'NEXT_PUBLIC_VAPID_PUBLIC_KEY not set — push subscription skipped')
         return
       }
 
-      const sub = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidKey),
-      })
+      logError('push', 'registering push-sw.js')
+      const reg = await navigator.serviceWorker.register('/push-sw.js', { scope: '/push-scope/' })
+      logError('push', 'push-sw.js registered')
+
+      // Check for existing subscription before creating a new one
+      let sub = await reg.pushManager.getSubscription()
+      if (sub) {
+        logError('push', 'existing subscription found — re-saving to DB', sub.endpoint.slice(0, 30))
+      } else {
+        logError('push', 'no existing subscription — creating new')
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(vapidKey),
+        })
+        logError('push', 'subscribed', 'endpoint=' + sub.endpoint.slice(0, 30))
+      }
+
       const json = sub.toJSON()
       if (!json.keys) {
-        console.error('Push subscription missing keys')
+        logError('push', 'Push subscription missing keys')
         return
       }
 
@@ -158,10 +198,10 @@ export function usePushPermission() {
         body: JSON.stringify({ endpoint: sub.endpoint, keys: json.keys }),
       })
       if (!res.ok) {
-        console.error('Failed to save push subscription', await res.text())
+        logError('push', 'subscription save failed', await res.text())
       }
     } catch (err) {
-      console.error('Push subscription error:', err)
+      logError('push', 'Push subscription error', err)
     } finally {
       setSubscribing(false)
     }

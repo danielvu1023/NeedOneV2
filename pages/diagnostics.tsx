@@ -3,9 +3,9 @@
  * Useful for mobile debugging without USB. Shows Supabase health, env vars,
  * session state, browser capabilities, and captured error log.
  */
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
-import { getErrors } from '@/lib/errorLog'
+import { getErrors, logError } from '@/lib/errorLog'
 
 
 interface HealthResult {
@@ -31,6 +31,18 @@ interface BrowserCaps {
   permission: string
 }
 
+interface PushSubStatus {
+  permission: string
+  swRegistered: boolean
+  endpoint: string | null
+  loading: boolean
+}
+
+export function getServerSideProps() {
+  if (process.env.NODE_ENV === 'production') return { notFound: true }
+  return { props: {} }
+}
+
 export default function DiagnosticsPage() {
   const [health, setHealth] = useState<HealthResult | null>(null)
   const [envStatus, setEnvStatus] = useState<EnvStatus | null>(null)
@@ -39,6 +51,7 @@ export default function DiagnosticsPage() {
   const [errors, setErrors] = useState<ReturnType<typeof getErrors>>([])
   const [refreshCount, setRefreshCount] = useState(0)
   const [loadTime, setLoadTime] = useState('')
+  const [pushSub, setPushSub] = useState<PushSubStatus>({ permission: 'checking…', swRegistered: false, endpoint: null, loading: false })
 
   useEffect(() => {
     setLoadTime(new Date().toISOString())
@@ -98,6 +111,95 @@ export default function DiagnosticsPage() {
     const interval = setInterval(() => setErrors(getErrors()), 2000)
     return () => clearInterval(interval)
   }, [])
+
+  // Check push subscription status
+  const checkPushSub = useCallback(async () => {
+    if (typeof Notification === 'undefined' || !('serviceWorker' in navigator)) {
+      setPushSub({ permission: 'unavailable', swRegistered: false, endpoint: null, loading: false })
+      return
+    }
+    const permission = Notification.permission
+    let swRegistered = false
+    let endpoint: string | null = null
+    try {
+      const regs = await navigator.serviceWorker.getRegistrations()
+      // Check all SW states — active may not be set right after registration
+      const swUrlMatch = (r: ServiceWorkerRegistration) =>
+        r.scope.includes('push-scope') ||
+        [r.active, r.waiting, r.installing].some((sw) => sw?.scriptURL?.includes('push-sw'))
+      swRegistered = regs.some(swUrlMatch)
+      // Find endpoint from any registration that has an active push subscription
+      for (const r of regs) {
+        const sub = await r.pushManager.getSubscription()
+        if (sub) {
+          endpoint = sub.endpoint.slice(0, 40) + '…'
+          break
+        }
+      }
+    } catch {
+      // ignore
+    }
+    setPushSub({ permission, swRegistered, endpoint, loading: false })
+  }, [])
+
+  useEffect(() => {
+    checkPushSub()
+  }, [checkPushSub, refreshCount])
+
+  const resubscribe = useCallback(async () => {
+    setPushSub((s) => ({ ...s, loading: true }))
+    try {
+      const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+      if (!vapidKey) {
+        logError('push', 'NEXT_PUBLIC_VAPID_PUBLIC_KEY not set')
+        setPushSub((s) => ({ ...s, loading: false }))
+        return
+      }
+      logError('push', 'registering push-sw.js')
+      const reg = await navigator.serviceWorker.register('/push-sw.js', { scope: '/push-scope/' })
+      logError('push', 'push-sw.js registered')
+
+      function urlBase64ToUint8Array(base64String: string): ArrayBuffer {
+        const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+        const rawData = window.atob(base64)
+        const outputArray = new Uint8Array(rawData.length)
+        for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i)
+        return outputArray.buffer as ArrayBuffer
+      }
+
+      let sub = await reg.pushManager.getSubscription()
+      if (sub) {
+        logError('push', 'existing subscription found — re-saving to DB', sub.endpoint.slice(0, 30))
+      } else {
+        logError('push', 'no existing subscription — creating new')
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(vapidKey),
+        })
+        logError('push', 'subscribed', 'endpoint=' + sub.endpoint.slice(0, 30))
+      }
+
+      const json = sub.toJSON()
+      if (json.keys) {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          const res = await fetch('/api/push/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+            body: JSON.stringify({ endpoint: sub.endpoint, keys: json.keys }),
+          })
+          if (!res.ok) logError('push', 'subscription save failed', await res.text())
+        } else {
+          logError('push', 're-subscribe: no session — subscription not saved to DB')
+        }
+      }
+    } catch (err) {
+      logError('push', 're-subscribe error', err)
+    } finally {
+      await checkPushSub()
+    }
+  }, [checkPushSub])
 
   const row = (label: string, value: React.ReactNode, ok?: boolean) => (
     <tr key={label}>
@@ -207,6 +309,27 @@ export default function DiagnosticsPage() {
               </tbody>
             </table>
           )}
+        </div>
+      </section>
+
+      {/* Push Subscription */}
+      <section style={{ marginBottom: 24 }}>
+        <h2 style={{ fontSize: 13, fontWeight: 700, color: '#98c52c', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 }}>Push Subscription</h2>
+        <div style={{ background: '#1a2e1a', borderRadius: 8, padding: '12px 14px' }}>
+          <table style={{ borderCollapse: 'collapse', width: '100%', marginBottom: 10 }}>
+            <tbody>
+              {row('permission', pushSub.permission, pushSub.permission === 'granted')}
+              {row('push-sw.js registered', String(pushSub.swRegistered), pushSub.swRegistered)}
+              {row('active endpoint', pushSub.endpoint ?? 'none', pushSub.endpoint !== null)}
+            </tbody>
+          </table>
+          <button
+            onClick={resubscribe}
+            disabled={pushSub.loading}
+            style={{ fontSize: 11, padding: '4px 10px', background: '#1e3a1e', border: '1px solid #2d5a2d', borderRadius: 6, color: '#98c52c', cursor: pushSub.loading ? 'not-allowed' : 'pointer', opacity: pushSub.loading ? 0.6 : 1 }}
+          >
+            {pushSub.loading ? 'subscribing…' : 'Re-subscribe'}
+          </button>
         </div>
       </section>
 

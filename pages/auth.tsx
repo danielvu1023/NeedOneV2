@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '@/lib/supabase'
 import { logError } from '@/lib/errorLog'
+import AuthInstallNudge from '@/components/AuthInstallNudge'
 
 
 export default function AuthPage() {
@@ -93,6 +94,8 @@ export default function AuthPage() {
           <p className="text-moss mt-2 text-sm">find who&apos;s at the park</p>
         </div>
 
+        <AuthInstallNudge />
+
         {step === 'email' ? (
           <form onSubmit={handleSendCode} className="space-y-4">
             <div>
@@ -102,7 +105,7 @@ export default function AuthPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
                 required
-                className="w-full bg-white border border-sage-mid text-forest placeholder-moss rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-moss transition-colors"
+                className="w-full bg-white border border-sage-mid text-forest placeholder-moss rounded-xl px-4 py-3.5 text-base focus:outline-none focus:border-moss transition-colors"
               />
             </div>
             {error && <p className="text-rally text-xs">{error}</p>}
@@ -131,7 +134,7 @@ export default function AuthPage() {
                 placeholder="123456"
                 required
                 maxLength={6}
-                className="w-full bg-white border border-sage-mid text-forest placeholder-moss rounded-xl px-4 py-3.5 text-sm text-center tracking-[0.3em] focus:outline-none focus:border-moss transition-colors"
+                className="w-full bg-white border border-sage-mid text-forest placeholder-moss rounded-xl px-4 py-3.5 text-base text-center tracking-[0.3em] focus:outline-none focus:border-moss transition-colors"
               />
             </div>
             {error && <p className="text-rally text-xs">{error}</p>}

@@ -22,7 +22,7 @@ try {
   console.warn('web-push not installed — push notifications disabled. Run: npm install web-push')
 }
 
-const COOLDOWN_MS = 0 // TODO: restore to 2 * 60 * 60 * 1000 before wider rollout
+const COOLDOWN_MS = 60 * 1000 // 1 minute cooldown per notifier→recipient pair
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 function isRelativePath(u: unknown): boolean {

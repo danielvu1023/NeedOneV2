@@ -44,6 +44,15 @@ export function useFriendships() {
       addressee_id: addresseeId,
     })
     mutate()
+    // Fire-and-forget push notification to addressee
+    fetch('/api/friends/request-notify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ addresseeId }),
+    }).catch(() => {})
   }
 
   async function acceptRequest(friendshipId: string) {
