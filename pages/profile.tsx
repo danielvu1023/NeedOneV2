@@ -224,15 +224,6 @@ export default function ProfilePage() {
           </button>
         </div>
 
-        {/* TODO: remove — dev only */}
-        <div className="mt-6 pt-4 border-t border-sage-mid">
-          <a
-            href="/push-test"
-            className="block w-full text-center bg-yellow-100 border border-yellow-300 text-yellow-800 rounded-xl py-3 text-xs font-mono"
-          >
-            🔔 Push Notification Test (dev only)
-          </a>
-        </div>
       </div>
       </div>
 
