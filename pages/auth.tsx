@@ -11,10 +11,7 @@ export default function AuthPage() {
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [loadTime, setLoadTime] = useState('')
   const router = useRouter()
-
-  useEffect(() => { setLoadTime(new Date().toLocaleTimeString('en-US', { hour12: false })) }, [])
 
   async function handleSendCode(e: React.FormEvent) {
     e.preventDefault()
@@ -155,22 +152,6 @@ export default function AuthPage() {
         )}
       </div>
 
-      {/* TODO: remove — dev only */}
-      <div className="fixed bottom-4 right-4 flex flex-col items-end gap-2">
-        <span className="text-xs font-mono text-moss/50">{loadTime}</span>
-        <a
-          href="/diagnostics"
-          className="text-xs font-mono text-moss bg-yellow-100 border border-yellow-300 px-3 py-1.5 rounded-lg"
-        >
-          🔍 diagnostics
-        </a>
-        <a
-          href="/push-test"
-          className="text-xs font-mono text-moss bg-yellow-100 border border-yellow-300 px-3 py-1.5 rounded-lg"
-        >
-          🔔 push test
-        </a>
-      </div>
     </div>
   )
 }
