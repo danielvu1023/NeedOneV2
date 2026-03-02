@@ -102,6 +102,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session)
       if (session) {
+        // On sign-in, hold loading=true while we check the profile so pages
+        // show a spinner instead of flashing content before the redirect fires.
+        if (event === 'SIGNED_IN') setLoading(true)
         // Non-async callback — SDK awaits subscribers, so an async callback here
         // blocks verifyOtp from ever resolving. Use .then() to fire-and-forget.
         loadProfile(session.user.id).then((p) => {
@@ -117,6 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               router.replace('/onboarding')
             }
           }
+          setLoading(false)
         })
       } else {
         setProfile(null)
