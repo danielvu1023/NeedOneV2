@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '@/lib/supabase'
 import { logError } from '@/lib/errorLog'
@@ -50,9 +50,9 @@ export default function AuthPage() {
         setError(msg)
         setLoading(false)
       } else {
-        // Use soft navigation so the session already in React state (set by
-        // onAuthStateChange SIGNED_IN) carries over — avoids the Safari timing
-        // issue where a hard reload re-reads localStorage before the write is durable.
+        // Soft navigation — avoids hard reload before session write is durable on Safari.
+        // For fully set up users this lands on '/'. For new/incomplete users,
+        // onAuthStateChange SIGNED_IN handler in useAuth intercepts first.
         router.replace('/')
       }
     } catch (err) {

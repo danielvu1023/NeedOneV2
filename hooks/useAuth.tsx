@@ -106,7 +106,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // blocks verifyOtp from ever resolving. Use .then() to fire-and-forget.
         loadProfile(session.user.id).then((p) => {
           if (event === 'SIGNED_IN' && p !== LOAD_FAILED) {
-            redirectIfNeeded(p, router.pathname)
+            // Can't use redirectIfNeeded here — router.pathname is still '/auth'
+            // (exempt) when this .then() runs, so the path check would bail out.
+            // For incomplete users, redirect now before auth.tsx's router.replace('/')
+            // wins the race. For fully set up users, let auth.tsx handle it (Safari
+            // soft-nav: avoids hard reload before session write is durable).
+            if (!p || !p.first_name) {
+              router.replace('/profile-setup')
+            } else if (!p.onboarding_completed) {
+              router.replace('/onboarding')
+            }
           }
         })
       } else {

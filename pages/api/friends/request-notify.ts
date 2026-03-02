@@ -44,13 +44,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const requesterName = profile?.first_name ?? 'Someone'
 
-  // Insert in-app notification
-  await supabaseServer.from('notifications').insert({
-    type: 'friend_request',
-    user_id: addresseeId,
-    actor_id: requesterId,
-    read: false,
-  })
+  // In-app notification is handled by the DB trigger on_friendship_created —
+  // no manual insert needed here.
 
   // Send push notification if available
   if (!webpush) return res.status(200).json({ notified: 0, warning: 'web-push not installed' })
