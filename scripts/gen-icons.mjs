@@ -26,17 +26,19 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 5 62 62">
 
 const svgBuffer = Buffer.from(svg)
 
-async function generate(size, filename) {
-  await sharp(svgBuffer, { density: Math.ceil(size * 72 / 62) })
+async function generate(size, filename, { background } = {}) {
+  let pipeline = sharp(svgBuffer, { density: Math.ceil(size * 72 / 62) })
     .resize(size, size)
-    .png()
-    .toFile(path.join(outDir, filename))
+  if (background) {
+    pipeline = pipeline.flatten({ background })
+  }
+  await pipeline.png().toFile(path.join(outDir, filename))
   console.log(`✓ ${filename} (${size}×${size})`)
 }
 
 await generate(192, 'icon-192.png')
 await generate(512, 'icon-512.png')
 await generate(32,  'favicon-32.png')
-await generate(180, 'apple-touch-icon.png')
+await generate(180, 'apple-touch-icon.png', { background: '#ffffff' })
 
 console.log('Done.')
