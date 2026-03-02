@@ -11,6 +11,9 @@ export default function Document() {
           href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Outfit:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
         />
+        {/* Favicons */}
+        <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
         {/* PWA: allow full-screen with safe-area support */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         {/* PWA: iOS standalone mode */}

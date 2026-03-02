@@ -73,7 +73,7 @@ export default function AuthPage() {
       <div className="w-full max-w-sm">
         <div className="mb-10 text-center">
           <div className="flex justify-center mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 82 72" className="w-16 h-16" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="10 5 62 62" className="w-24 h-24" aria-hidden="true">
               <g fill="#0f1e0c">
                 <path d="M66.8 36.2 C 66.8 50.3 55.4 61.7 41.3 61.7 27.3 61.7 15.9 50.3 15.9 36.2 15.9 22.2 27.3 10.8 41.3 10.8 55.4 10.8 66.8 22.2 66.8 36.2 Z M32.2 60.5  M59.2 36.1 C 59.2 26 51.1 17.9 41 17.9 31 17.9 22.8 26 22.8 36.1 22.8 46.1 31 54.3 41 54.3 51.1 54.3 59.2 46.1 59.2 36.1 Z M49.7 51.9 "/>
               </g>
