@@ -38,6 +38,15 @@ interface PushSubStatus {
   loading: boolean
 }
 
+function urlBase64ToUint8Array(base64String: string): ArrayBuffer {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+  const rawData = window.atob(base64)
+  const outputArray = new Uint8Array(rawData.length)
+  for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i)
+  return outputArray.buffer as ArrayBuffer
+}
+
 export function getServerSideProps() {
   if (process.env.NODE_ENV === 'production') return { notFound: true }
   return { props: {} }
@@ -158,15 +167,6 @@ export default function DiagnosticsPage() {
       logError('push', 'registering push-sw.js')
       const reg = await navigator.serviceWorker.register('/push-sw.js', { scope: '/push-scope/' })
       logError('push', 'push-sw.js registered')
-
-      function urlBase64ToUint8Array(base64String: string): ArrayBuffer {
-        const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
-        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
-        const rawData = window.atob(base64)
-        const outputArray = new Uint8Array(rawData.length)
-        for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i)
-        return outputArray.buffer as ArrayBuffer
-      }
 
       let sub = await reg.pushManager.getSubscription()
       if (sub) {
