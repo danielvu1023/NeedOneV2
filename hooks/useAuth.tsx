@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { logError } from '@/lib/errorLog'
 import type { Profile } from '@/lib/types'
 
-const EXEMPT_PATHS = ['/auth', '/profile-setup', '/onboarding', '/push-test', '/diagnostics']
+const EXEMPT_PATHS = ['/auth', '/profile-setup', '/onboarding', '/push-test', '/diagnostics', '/design', '/spline-test', '/']
 
 interface AuthContextType {
   session: Session | null

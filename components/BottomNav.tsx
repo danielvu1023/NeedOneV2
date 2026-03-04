@@ -6,7 +6,7 @@ interface BottomNavProps {
 
 const tabs = [
   { href: '/friends', label: 'Friends' },
-  { href: '/',       label: 'Parks'   },
+  { href: '/map',     label: 'Parks'   },
   { href: '/profile', label: 'Profile' },
 ]
 
@@ -37,7 +37,7 @@ function ProfileIcon({ active }: { active: boolean }) {
 
 const icons = {
   '/friends': FriendsIcon,
-  '/': ParksIcon,
+  '/map': ParksIcon,
   '/profile': ProfileIcon,
 }
 
@@ -45,7 +45,7 @@ export default function BottomNav({ onParkListOpen }: BottomNavProps) {
   const router = useRouter()
 
   function handleTabPress(href: string) {
-    if (href === '/' && router.pathname === '/') {
+    if (href === '/map' && router.pathname === '/map') {
       onParkListOpen?.()
     } else {
       router.push(href)

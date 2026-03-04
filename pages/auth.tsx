@@ -51,9 +51,9 @@ export default function AuthPage() {
         setLoading(false)
       } else {
         // Soft navigation — avoids hard reload before session write is durable on Safari.
-        // For fully set up users this lands on '/'. For new/incomplete users,
+        // For fully set up users this lands on '/map'. For new/incomplete users,
         // onAuthStateChange SIGNED_IN handler in useAuth intercepts first.
-        router.replace('/')
+        router.replace('/map')
       }
     } catch (err) {
       console.error('[auth] verifyOtp threw:', err)

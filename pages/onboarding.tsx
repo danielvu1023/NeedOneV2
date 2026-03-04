@@ -22,7 +22,7 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     if (!loading && profile?.onboarding_completed) {
-      router.replace('/')
+      router.replace('/map')
     }
   }, [loading, profile, router])
 
@@ -38,7 +38,7 @@ export default function OnboardingPage() {
       .from('profiles')
       .update({ onboarding_completed: true })
       .eq('id', session.user.id)
-    router.replace('/')
+    router.replace('/map')
   }
 
   function getButtonState(userId: string) {
@@ -121,7 +121,7 @@ export default function OnboardingPage() {
                   ) : (
                     <button
                       onClick={() => handleAddFriend(person.id)}
-                      className="bg-green-500 text-forest text-xs font-display font-bold rounded-lg px-3 py-1.5 hover:bg-green-400 transition-colors"
+                      className="bg-electric text-forest text-xs font-display font-bold rounded-lg px-3 py-1.5 hover:bg-electric/90 transition-colors"
                     >
                       + Add
                     </button>
@@ -141,7 +141,7 @@ export default function OnboardingPage() {
         <button
           onClick={handleContinue}
           disabled={completing}
-          className="w-full mt-4 bg-forest text-court font-display font-bold rounded-xl py-3.5 text-sm hover:bg-forest/90 transition-colors disabled:opacity-50"
+          className="w-full mt-4 bg-electric text-forest font-display font-bold rounded-xl py-3.5 text-sm hover:bg-electric/90 transition-colors disabled:opacity-50"
         >
           {completing ? 'Saving…' : 'Continue →'}
         </button>

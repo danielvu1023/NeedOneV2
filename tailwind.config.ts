@@ -8,6 +8,7 @@ const config: Config = {
   safelist: [
     'bg-court', 'text-court', 'border-court',
     'bg-forest', 'text-forest', 'border-forest',
+    'bg-electric', 'text-electric', 'border-electric',
     'bg-sage', 'bg-sage-mid', 'border-sage-mid',
     'text-moss', 'bg-moss',
     'bg-rally', 'text-rally',
@@ -19,10 +20,11 @@ const config: Config = {
           DEFAULT: '#EFF5E4',
           mid: '#D8EBC4',
         },
-        forest: '#0D1F0A',
-        court:  '#CBFF47',
-        moss:   '#6B7A5E',
-        rally:  '#FF5C38',
+        forest:   '#0D1F0A',
+        court:    '#CBFF47',
+        electric: '#22C55E',
+        moss:     '#6B7A5E',
+        rally:    '#FF5C38',
       },
       fontFamily: {
         display: ['Unbounded', 'sans-serif'],
