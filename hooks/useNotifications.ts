@@ -37,7 +37,12 @@ export function useNotifications() {
   }, [session, mutate])
 
   async function markRead(notificationId: string) {
-    await supabase.from('notifications').update({ read: true }).eq('id', notificationId)
+    if (!session) return
+    await supabase
+      .from('notifications')
+      .update({ read: true })
+      .eq('user_id', session.user.id)
+      .eq('id', notificationId)
     mutate()
   }
 

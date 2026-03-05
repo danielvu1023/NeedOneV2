@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
-import { QRCodeSVG } from 'qrcode.react'
+const QRCodeSVG = dynamic(() => import('qrcode.react').then((m) => m.QRCodeSVG), { ssr: false })
 import InitialsAvatar from '@/components/InitialsAvatar'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -395,15 +395,13 @@ export default function Landing() {
                 border: '1px solid rgba(34,197,94,0.2)',
                 boxShadow: '0 0 0 1px var(--border), 0 24px 64px rgba(34,197,94,0.08)',
               }}>
-                {typeof window !== 'undefined' && (
-                  <QRCodeSVG
-                    value={`${window.location.origin}${session ? '/map' : '/auth'}`}
-                    size={200}
-                    bgColor="transparent"
-                    fgColor="#0f1e0c"
-                    style={{ borderRadius: '12px', display: 'block' }}
-                  />
-                )}
+                <QRCodeSVG
+                  value={`${window.location.origin}${session ? '/map' : '/auth'}`}
+                  size={200}
+                  bgColor="transparent"
+                  fgColor="#0f1e0c"
+                  style={{ borderRadius: '12px', display: 'block' }}
+                />
                 <p className="text-center mt-4" style={{
                   fontSize: '11px', color: 'var(--muted)',
                   fontFamily: 'Outfit, sans-serif',
