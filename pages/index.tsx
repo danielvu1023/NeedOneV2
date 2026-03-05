@@ -396,7 +396,7 @@ export default function Landing() {
                 boxShadow: '0 0 0 1px var(--border), 0 24px 64px rgba(34,197,94,0.08)',
               }}>
                 <QRCodeSVG
-                  value={`${window.location.origin}${session ? '/map' : '/auth'}`}
+                  value={`${typeof window !== 'undefined' ? window.location.origin : ''}${session ? '/map' : '/auth'}`}
                   size={200}
                   bgColor="transparent"
                   fgColor="#0f1e0c"
