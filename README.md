@@ -388,7 +388,18 @@ npx supabase db reset
 npm run dev
 ```
 
-App runs at `http://localhost:3000`.
+App runs at `http://localhost:3000`. Local emails (OTP codes) are captured by Inbucket at `http://localhost:54324`.
+
+### Optional: Cloudflare Tunnel (HTTPS / OAuth / Push)
+
+OAuth, push notifications, and PWA install require a public HTTPS URL. A named Cloudflare tunnel is configured to route `dev.needonepickleball.com` to your local server:
+
+```bash
+# Make sure cloudflared is installed, then:
+cloudflared tunnel run needone-dev
+```
+
+This runs alongside `npm run dev` and exposes your local app at `https://dev.needonepickleball.com`.
 
 ### Optional: Push Notifications
 

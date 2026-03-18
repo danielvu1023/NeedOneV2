@@ -12,6 +12,7 @@ const config: Config = {
     'bg-sage', 'bg-sage-mid', 'border-sage-mid',
     'text-moss', 'bg-moss',
     'bg-rally', 'text-rally',
+    'bg-amber-100', 'text-amber-700', 'bg-red-100', 'text-red-700',
   ],
   theme: {
     extend: {

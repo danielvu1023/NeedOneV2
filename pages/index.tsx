@@ -62,8 +62,13 @@ export default function Landing() {
   const [contactEmail, setContactEmail] = useState('')
   const [contactMsg, setContactMsg] = useState('')
   const [contactSent, setContactSent] = useState(false)
+  const [origin, setOrigin] = useState('')
   const { session, loading } = useAuth()
   const router = useRouter()
+
+  useEffect(() => {
+    setOrigin(window.location.origin)
+  }, [])
 
   useEffect(() => {
     if (!loading && session) {
@@ -396,7 +401,7 @@ export default function Landing() {
                 boxShadow: '0 0 0 1px var(--border), 0 24px 64px rgba(34,197,94,0.08)',
               }}>
                 <QRCodeSVG
-                  value={`${typeof window !== 'undefined' ? window.location.origin : ''}${session ? '/map' : '/auth'}`}
+                  value={`${origin}${session ? '/map' : '/auth'}`}
                   size={200}
                   bgColor="transparent"
                   fgColor="#0f1e0c"
@@ -406,7 +411,7 @@ export default function Landing() {
                   fontSize: '11px', color: 'var(--muted)',
                   fontFamily: 'Outfit, sans-serif',
                   letterSpacing: '0.05em',
-                }}>{typeof window !== 'undefined' ? `${window.location.host}${session ? '/map' : '/auth'}` : ''}</p>
+                }}>{origin ? `${new URL(origin).host}${session ? '/map' : '/auth'}` : ''}</p>
               </div>
             </div>
             <a

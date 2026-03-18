@@ -7,6 +7,7 @@ interface BottomNavProps {
 const tabs = [
   { href: '/friends', label: 'Friends' },
   { href: '/map',     label: 'Parks'   },
+  { href: '/shots',   label: 'Shots'   },
   { href: '/profile', label: 'Profile' },
 ]
 
@@ -27,6 +28,15 @@ function ParksIcon({ active }: { active: boolean }) {
   )
 }
 
+function ShotsIcon({ active }: { active: boolean }) {
+  return (
+    <svg className={`w-6 h-6 ${active ? 'text-forest' : 'text-moss'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
+      <rect x="9" y="2" width="6" height="16" rx="3" transform="rotate(15 12 10)" strokeLinecap="round" strokeLinejoin="round" />
+      <line x1="12" y1="18" x2="12" y2="22" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 function ProfileIcon({ active }: { active: boolean }) {
   return (
     <svg className={`w-6 h-6 ${active ? 'text-forest' : 'text-moss'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
@@ -38,6 +48,7 @@ function ProfileIcon({ active }: { active: boolean }) {
 const icons = {
   '/friends': FriendsIcon,
   '/map': ParksIcon,
+  '/shots': ShotsIcon,
   '/profile': ProfileIcon,
 }
 
