@@ -116,6 +116,34 @@ NEXT_PUBLIC_MAPBOX_TOKEN=              # from: mapbox.com/account/access-tokens
 
 ---
 
+## Shot Data Rules
+
+The shots feature lives in `components/Shots/` and `pages/shots.tsx`.
+
+### Two schemas coexist
+
+1. **`ShotData`** — the original format used by the 3 hand-authored shots. Has `technique: string[]`, `errors: ShotError[]` with severity colors, `drawerDetails`, `videoStart`, and uses a shared `VIDEO_ID` constant.
+
+2. **`EnrichedShot`** — the pipeline-generated format from automated YouTube transcript analysis. Has `technique: { label, cue }[]`, `errors: { badge, description }[]`, `expandDetails`, `startTime`, its own `videoId`, plus `category`, `grip`, `swingDirection`, `finishPosition`, `relatedShots`, and `confidence`.
+
+The union type `Shot = ShotData | EnrichedShot` and the type guard `isEnrichedShot()` live in `shotData.ts`. Use `isEnrichedShot()` to branch logic.
+
+### Key files
+- `components/Shots/shotData.ts` — all shot data, both interfaces, the `shots` array (typed as `Shot[]`)
+- `components/Shots/ShotCard.tsx` — renders both formats via conditional branches
+- `components/Shots/diagrams/` — SVG diagram components keyed by shot ID
+- `pages/shots.tsx` — maps shot IDs to diagrams via `Record<string, ReactNode>`, uses `PlaceholderDiagram` for shots without a custom diagram
+
+### Adding new shots
+- Append `EnrichedShot` objects to the `shots` array in `shotData.ts`
+- Use kebab-case for `id` (e.g., `'backhand-counter'`)
+- `videoId` is the YouTube video ID (not the full URL)
+- `startTime` is in seconds
+- No diagram component needed — `PlaceholderDiagram` renders automatically
+- Do NOT modify the existing 3 `ShotData` entries
+
+---
+
 ## Security Checklist — Run Before Every Push
 
 Before committing or pushing any code change, verify each item below. These checks were established after a security audit of the MVP (2026-02-27).

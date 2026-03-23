@@ -16,9 +16,33 @@ export interface ShotData {
   videoStart: number
 }
 
+export interface EnrichedShot {
+  id: string
+  name: string
+  videoId: string
+  category: 'putaway' | 'counter' | 'drive' | 'reset' | 'serve' | 'other'
+  startTime: number
+  subtitle: string | null
+  technique: { label: string; cue: string }[]
+  errors: { badge: string; description: string }[]
+  tip: string | null
+  grip: string | null
+  swingDirection: 'low-to-high' | 'flat' | 'high-to-low' | null
+  finishPosition: string | null
+  relatedShots: string[]
+  expandDetails: string[]
+  confidence: 'high' | 'medium' | 'low'
+}
+
+export type Shot = ShotData | EnrichedShot
+
+export function isEnrichedShot(shot: Shot): shot is EnrichedShot {
+  return 'videoId' in shot
+}
+
 export const VIDEO_ID = '1GCxgYCUb8E'
 
-export const shots: ShotData[] = [
+export const shots: Shot[] = [
   {
     id: 'overhead-smash',
     name: 'Overhead smash',
