@@ -170,4 +170,51 @@ export const shots: Shot[] = [
     ],
     confidence: 'high',
   },
+  {
+    id: 'toss-in-dink',
+    name: 'Toss-In Dink',
+    videoId: 'OPbxaqImuJo',
+    category: 'reset',
+    startTime: 0,
+    subtitle: 'A dink hit from a toss serve setup, requiring paddle angle control',
+    technique: [
+      {
+        label: 'Paddle Position',
+        cue: 'Get the paddle tip down below the ball',
+      },
+      {
+        label: 'Wrist Position',
+        cue: 'Keep a laid-back wrist to allow paddle head to drop',
+      },
+      {
+        label: 'Paddle Angle Check',
+        cue: 'Ensure the butt cap of your paddle is facing up, confirming you\'re getting below the ball',
+      },
+      {
+        label: 'Motion',
+        cue: 'Execute a smooth, controlled motion',
+      },
+    ],
+    errors: [
+      {
+        badge: 'High Paddle Position',
+        description: 'Never dropping the paddle head below the ball, preventing proper contact',
+      },
+      {
+        badge: 'Lack of Paddle Angle',
+        description: 'Not getting under the ball due to insufficient paddle drop',
+      },
+    ],
+    tip: 'Drop the paddle head below the ball and look for your butt cap facing up as confirmation',
+    grip: null,
+    swingDirection: 'low-to-high',
+    finishPosition: null,
+    relatedShots: [],
+    expandDetails: [
+      'The laid-back wrist is critical to allow natural paddle head drop',
+      'Visual confirmation: butt cap should face upward when executing properly',
+      'This ensures consistent contact below the ball for control',
+    ],
+    confidence: 'high',
+  },
 ]
