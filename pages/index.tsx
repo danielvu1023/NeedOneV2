@@ -7,6 +7,14 @@ import InitialsAvatar from '@/components/InitialsAvatar'
 import { useAuth } from '@/hooks/useAuth'
 
 const LandingPhoneDemo = dynamic(() => import('@/components/LandingPhoneDemo'), { ssr: false })
+const PickleballScene = dynamic(() => import('@/components/PickleballScene'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full flex items-center justify-center" style={{ height: 'clamp(350px, 50vw, 600px)', background: 'var(--bg)' }}>
+      <div className="text-sm" style={{ color: 'var(--muted)' }}>Loading 3D scene...</div>
+    </div>
+  ),
+})
 
 const CheckIcon = () => (
   <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
@@ -132,12 +140,12 @@ export default function Landing() {
 
 
         {/* ── HERO ── */}
-        <section className="map-bg relative min-h-screen flex items-center overflow-hidden pt-16">
+        <section className="map-bg relative min-h-[92vh] flex items-center overflow-hidden pt-16">
           <div className="hero-glow absolute inset-0 pointer-events-none" />
           <div className="absolute inset-0 pointer-events-none"
             style={{ background: 'radial-gradient(ellipse 90% 90% at 50% 50%, transparent 35%, var(--bg) 100%)' }} />
 
-          <div className="max-w-[1440px] mx-auto px-6 md:px-12 w-full py-20 flex flex-col md:grid md:grid-cols-2 gap-12 lg:gap-20 items-center relative z-10">
+          <div className="max-w-[1440px] mx-auto px-6 md:px-12 w-full py-20 flex flex-col md:grid md:grid-cols-2 gap-16 md:gap-12 lg:gap-20 items-center relative z-10">
 
             {/* Hero Copy */}
             <div>
@@ -186,10 +194,51 @@ export default function Landing() {
             </div>
           </div>
 
+          {/* Scroll indicator */}
+          <button
+            className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 hidden md:flex flex-col items-center gap-1 group"
+            onClick={() => document.getElementById('court-scene')?.scrollIntoView({ behavior: 'smooth' })}
+            aria-label="Scroll down"
+          >
+            <span className="text-[10px] font-display font-bold tracking-widest uppercase" style={{ color: 'var(--muted)' }}>
+              Scroll
+            </span>
+            <svg
+              width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="var(--muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+              className="animate-bounce"
+            >
+              <path d="M7 13l5 5 5-5" /><path d="M7 6l5 5 5-5" />
+            </svg>
+          </button>
+
           <div className="absolute bottom-0 left-0 right-0 h-28 pointer-events-none"
             style={{ background: 'linear-gradient(transparent,var(--bg))' }} />
         </section>
 
+
+        {/* ── 3D COURT SCENE ── */}
+        <section id="court-scene" className="py-12 md:py-20 relative overflow-hidden">
+          <div className="max-w-[1440px] mx-auto px-6 md:px-12">
+            <div className="text-center mb-8 scroll-reveal">
+              <p className="section-label mb-3" style={{ color: 'var(--accent)' }}>The Court</p>
+              <h2 className="font-display" style={{ fontSize: 'clamp(32px, 5vw, 56px)', lineHeight: 1.1 }}>
+                Where the game <span style={{ color: 'var(--accent)' }}>happens.</span>
+              </h2>
+            </div>
+            <div className="scroll-reveal rounded-2xl overflow-hidden relative" style={{ transitionDelay: '0.1s' }}>
+              <PickleballScene />
+            </div>
+            <div className="flex justify-center mt-4">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full"
+                style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}>
+                <span className="text-xs font-display font-bold tracking-wider uppercase" style={{ color: 'var(--accent)' }}>
+                  Drag to explore the court
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* ── HOW IT WORKS ── */}
         <section id="how-it-works" className="py-16 md:py-24 max-w-[1440px] mx-auto px-6 md:px-12">
@@ -407,11 +456,6 @@ export default function Landing() {
                   fgColor="#0f1e0c"
                   style={{ borderRadius: '12px', display: 'block' }}
                 />
-                <p className="text-center mt-4" style={{
-                  fontSize: '11px', color: 'var(--muted)',
-                  fontFamily: 'Outfit, sans-serif',
-                  letterSpacing: '0.05em',
-                }}>{origin ? `${new URL(origin).host}${session ? '/map' : '/auth'}` : ''}</p>
               </div>
             </div>
             <a
