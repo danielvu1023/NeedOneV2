@@ -118,4 +118,56 @@ export const shots: Shot[] = [
       'Eastern grip naturally closes the paddle face a few degrees — generates topspin without extra wrist work.',
     ],
   },
+  {
+    id: 'top-spin-lob',
+    name: 'Top Spin Lob',
+    videoId: 'O4h7yVzr6Yw',
+    category: 'other',
+    startTime: 0,
+    subtitle: 'An offensive lob shot used to keep opponents on their toes and create scoring opportunities',
+    technique: [
+      {
+        label: 'Preparation',
+        cue: 'Prep early with paddle tip down to ensure enough space and time',
+      },
+      {
+        label: 'Swing Motion',
+        cue: 'Swing in a vertical motion using shoulder rotation rather than wrist',
+      },
+      {
+        label: 'Wrist Usage',
+        cue: 'Minimize wrist utilization; rely on shoulder more for consistency',
+      },
+      {
+        label: 'Follow-Through Position',
+        cue: 'Be ready to move into an offensive position leaning in after the shot',
+      },
+    ],
+    errors: [
+      {
+        badge: 'Excessive Wrist',
+        description: 'Using too much wrist motion instead of shoulder rotation reduces consistency',
+      },
+      {
+        badge: 'Late Prep',
+        description: 'Failing to prep early and with paddle tip down limits control',
+      },
+      {
+        badge: 'Passive Follow-Through',
+        description: 'Not being ready to move into an offensive position after hitting the lob',
+      },
+    ],
+    tip: 'Keep your opponents on their toes with this shot that pros are using in today\'s game',
+    grip: null,
+    swingDirection: 'low-to-high',
+    finishPosition: 'Ready in an offensive position leaning in',
+    relatedShots: [],
+    expandDetails: [
+      'This is a modern pro-level shot gaining popularity in current pickleball',
+      'Be prepared for either a short lob that you can attack or one that clears your opponent\'s head',
+      'The vertical swing motion is key to generating topspin while maintaining consistency',
+      'Having proper spacing and time to prep is essential for executing this shot successfully',
+    ],
+    confidence: 'high',
+  },
 ]
