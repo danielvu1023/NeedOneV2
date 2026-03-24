@@ -217,4 +217,104 @@ export const shots: Shot[] = [
     ],
     confidence: 'high',
   },
+  {
+    id: 'backhand-roll',
+    name: 'Backhand Roll',
+    videoId: 'mzbKwHzhG0Q',
+    category: 'reset',
+    startTime: 0,
+    subtitle: 'A slower, controlled shot used to reset the point when opponents are at the kitchen line, typically not a finishing shot',
+    technique: [
+      {
+        label: 'Knee to Waist Ratio',
+        cue: 'Bend your knees more than your waist. Lower knees allow you to reach further without collapsing',
+      },
+      {
+        label: 'Grip',
+        cue: 'Use continental grip and roll the paddle over with your wrist to maintain proper paddle angle while staying ready for counters',
+      },
+      {
+        label: 'Swing Speed',
+        cue: 'Slow down your swing. Think pace and location over snap - avoid flipping or snapping forward',
+      },
+      {
+        label: 'Contact Point - Crosscourt',
+        cue: 'Attack the ball out front, with paddle angle already pointing crosscourt direction',
+      },
+      {
+        label: 'Contact Point - Down the Line',
+        cue: 'Let the ball travel slightly more before contact, contacting closer to your body rather than out front',
+      },
+      {
+        label: 'Rotation Source',
+        cue: 'Rotate from the shoulder (6 to 12 o\'clock), not the elbow. Keep hand and arm relaxed',
+      },
+      {
+        label: 'Lead with Hand',
+        cue: 'Lead with your hand and shoulder connected, not with the paddle top. This prevents snapping and maintains control',
+      },
+      {
+        label: 'Body Connection',
+        cue: 'Keep the swing connected from knees and feet through to swinging arm for full body engagement',
+      },
+      {
+        label: 'Target Placement',
+        cue: 'Aim for the chicken wing/dominant side area or shoulder when opponent is at kitchen. Go as deep as possible when opponent is back',
+      },
+      {
+        label: 'Stance Width',
+        cue: 'Position feet wider than shoulder width apart for maximum reach and balance',
+      },
+      {
+        label: 'Low Ball Adjustment',
+        cue: 'With lower balls, swing slower and use closed paddle angle. Loft slightly rather than pulling over the ball',
+      },
+    ],
+    errors: [
+      {
+        badge: 'Excessive Waist Bend',
+        description: 'Bending too much from waist without knee bend limits reach and causes instability',
+      },
+      {
+        badge: 'Snapping/Flipping Motion',
+        description: 'Dropping paddle and snapping forward creates a flip rather than a controlled roll, losing pace and location control',
+      },
+      {
+        badge: 'Elbow-Driven Rotation',
+        description: 'Rotating from elbow instead of shoulder reduces control and consistency',
+      },
+      {
+        badge: 'Leading with Paddle',
+        description: 'Leading with paddle top causes snapping and prevents proper topspin and pace control',
+      },
+      {
+        badge: 'Loose Upper Body',
+        description: 'Not engaging non-paddle hand and keeping upper body disconnected reduces power and control',
+      },
+      {
+        badge: 'Narrow Stance',
+        description: 'Feet too close together reduces balance and maximum reach potential',
+      },
+    ],
+    tip: 'Focus on pace and location over snap. Think of it as a slower, controlled reset shot that will likely come back, so stay ready for the counter.',
+    grip: 'Continental',
+    swingDirection: 'low-to-high',
+    finishPosition: 'Ready position at the kitchen line, paddle up and prepared to counter',
+    relatedShots: [
+      'Backhand Volley',
+      'Crosscourt Roll',
+      'Down the Line Roll',
+      'Cross Body Speed Up',
+    ],
+    expandDetails: [
+      'The backhand roll changes based on opponent positioning - focus on location when they\'re at kitchen, depth when they\'re back',
+      'Natural backhand swing motion goes left to right, making crosscourt easier than down the line',
+      'Triangle rule applies: ball hit down the line comes back in similar area, crosscourt comes back on opposite side',
+      'Not every ball is equal - adjust swing speed and paddle angle based on ball height',
+      'The cross body speed up is one of the hardest counters from backhand position because opponent must respect both down-the-line and crosscourt options',
+      'When hitting low balls, use slower swing and more closed paddle angle, almost pulling over the ball',
+      'When hitting higher balls, use more loft and more open paddle angle',
+    ],
+    confidence: 'high',
+  },
 ]
