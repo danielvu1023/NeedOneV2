@@ -1,9 +1,9 @@
 import { useState, type ReactNode } from 'react'
-import type { ShotData } from './shotData'
-import { VIDEO_ID } from './shotData'
+import type { Shot } from './shotData'
+import { isEnrichedShot, VIDEO_ID } from './shotData'
 
 interface ShotCardProps {
-  shot: ShotData
+  shot: Shot
   diagram: ReactNode
 }
 
@@ -11,13 +11,22 @@ export default function ShotCard({ shot, diagram }: ShotCardProps) {
   const [expanded, setExpanded] = useState(false)
   const [videoOpen, setVideoOpen] = useState(false)
 
+  const enriched = isEnrichedShot(shot)
+  const videoId = enriched ? shot.videoId : VIDEO_ID
+  const videoStart = enriched ? shot.startTime : shot.videoStart
+
   return (
     <>
       <div className="bg-white rounded-2xl border border-sage-mid shadow-sm overflow-hidden">
         {/* Header */}
         <div className="px-4 pt-4 pb-2">
           <h2 className="font-display font-bold text-forest text-lg">{shot.name}</h2>
-          <p className="text-moss text-sm">{shot.subtitle}</p>
+          {shot.subtitle && <p className="text-moss text-sm">{shot.subtitle}</p>}
+          {enriched && (
+            <span className="inline-block mt-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-sage text-moss">
+              {shot.category}
+            </span>
+          )}
         </div>
 
         {/* Diagram */}
@@ -25,8 +34,8 @@ export default function ShotCard({ shot, diagram }: ShotCardProps) {
           {diagram}
         </div>
 
-        {/* Compare pill */}
-        {shot.comparePill && (
+        {/* Compare pill (old format only) */}
+        {!enriched && shot.comparePill && (
           <div className="px-4 pt-3">
             <span className="inline-block bg-sage rounded-full px-3 py-1.5 text-xs text-moss">
               {shot.comparePill}
@@ -34,44 +43,80 @@ export default function ShotCard({ shot, diagram }: ShotCardProps) {
           </div>
         )}
 
+        {/* Grip / swing direction (new format only) */}
+        {enriched && (shot.grip || shot.swingDirection) && (
+          <div className="px-4 pt-3 flex gap-2 flex-wrap">
+            {shot.grip && (
+              <span className="inline-block bg-sage rounded-full px-3 py-1.5 text-xs text-moss">
+                Grip: {shot.grip}
+              </span>
+            )}
+            {shot.swingDirection && (
+              <span className="inline-block bg-sage rounded-full px-3 py-1.5 text-xs text-moss">
+                Swing: {shot.swingDirection}
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Technique */}
         <div className="px-4 pt-3">
           <h3 className="text-[11px] font-bold uppercase tracking-widest text-moss mb-2">Key Technique</h3>
           <ul className="space-y-2">
-            {shot.technique.map((item, i) => (
-              <li key={i} className="flex gap-2.5 text-sm text-forest">
-                <span className="w-2 h-2 rounded-full bg-court mt-1.5 flex-shrink-0" />
-                <span className="font-medium">{item}</span>
-              </li>
-            ))}
+            {enriched
+              ? shot.technique.map((item, i) => (
+                  <li key={i} className="flex gap-2.5 text-sm text-forest">
+                    <span className="w-2 h-2 rounded-full bg-court mt-1.5 flex-shrink-0" />
+                    <span className="font-medium">
+                      <strong>{item.label}:</strong> {item.cue}
+                    </span>
+                  </li>
+                ))
+              : shot.technique.map((item, i) => (
+                  <li key={i} className="flex gap-2.5 text-sm text-forest">
+                    <span className="w-2 h-2 rounded-full bg-court mt-1.5 flex-shrink-0" />
+                    <span className="font-medium">{item}</span>
+                  </li>
+                ))}
           </ul>
           {/* Tip / mental cue */}
-          <div className="mt-3 bg-sage rounded-xl px-3.5 py-2.5 flex gap-2 items-start">
-            <span className="text-base mt-0.5 flex-shrink-0">💡</span>
-            <span className="text-sm text-forest">{shot.tip}</span>
-          </div>
+          {(enriched ? shot.tip : shot.tip) && (
+            <div className="mt-3 bg-sage rounded-xl px-3.5 py-2.5 flex gap-2 items-start">
+              <span className="text-base mt-0.5 flex-shrink-0">💡</span>
+              <span className="text-sm text-forest">{shot.tip}</span>
+            </div>
+          )}
         </div>
 
         {/* Errors */}
         <div className="px-4 pt-3">
           <h3 className="text-[11px] font-bold uppercase tracking-widest text-moss mb-3">Common Misses</h3>
           <div className="space-y-3">
-            {shot.errors.map((error, i) => (
-              <div key={i}>
-                <span
-                  className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold mb-1 ${
-                    error.severity === 'danger'
-                      ? 'bg-red-100 text-red-700'
-                      : error.severity === 'warning'
-                      ? 'bg-amber-100 text-amber-700'
-                      : 'border border-sage-mid text-moss'
-                  }`}
-                >
-                  {error.label}
-                </span>
-                <p className="text-sm text-forest">{error.description}</p>
-              </div>
-            ))}
+            {enriched
+              ? shot.errors.map((error, i) => (
+                  <div key={i}>
+                    <span className="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold mb-1 border border-sage-mid text-moss">
+                      {error.badge}
+                    </span>
+                    <p className="text-sm text-forest">{error.description}</p>
+                  </div>
+                ))
+              : shot.errors.map((error, i) => (
+                  <div key={i}>
+                    <span
+                      className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold mb-1 ${
+                        error.severity === 'danger'
+                          ? 'bg-red-100 text-red-700'
+                          : error.severity === 'warning'
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'border border-sage-mid text-moss'
+                      }`}
+                    >
+                      {error.label}
+                    </span>
+                    <p className="text-sm text-forest">{error.description}</p>
+                  </div>
+                ))}
           </div>
         </div>
 
@@ -86,7 +131,7 @@ export default function ShotCard({ shot, diagram }: ShotCardProps) {
             </svg>
             <span className="text-sm font-medium text-forest">Watch clip</span>
             <span className="text-xs text-moss ml-auto">
-              {Math.floor(shot.videoStart / 60)}:{String(shot.videoStart % 60).padStart(2, '0')}
+              {Math.floor(videoStart / 60)}:{String(videoStart % 60).padStart(2, '0')}
             </span>
           </button>
         </div>
@@ -115,13 +160,18 @@ export default function ShotCard({ shot, diagram }: ShotCardProps) {
             }`}
           >
             <ul className="pt-3 space-y-2">
-              {shot.drawerDetails.map((detail, i) => (
+              {(enriched ? shot.expandDetails : shot.drawerDetails).map((detail, i) => (
                 <li key={i} className="flex gap-2 text-sm text-forest">
                   <span className="text-moss mt-0.5 flex-shrink-0">&#8226;</span>
                   <span>{detail}</span>
                 </li>
               ))}
             </ul>
+            {enriched && shot.finishPosition && (
+              <p className="pt-2 text-sm text-moss italic">
+                Finish: {shot.finishPosition}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -148,7 +198,7 @@ export default function ShotCard({ shot, diagram }: ShotCardProps) {
             {/* Player — edge-to-edge on mobile, rounded on larger screens */}
             <div className="aspect-video w-full rounded-xl overflow-hidden bg-black shadow-2xl">
               <iframe
-                src={`https://www.youtube-nocookie.com/embed/${VIDEO_ID}?start=${shot.videoStart}&rel=0&modestbranding=1&playsinline=1`}
+                src={`https://www.youtube-nocookie.com/embed/${videoId}?start=${videoStart}&rel=0&modestbranding=1&playsinline=1`}
                 width="100%"
                 height="100%"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
